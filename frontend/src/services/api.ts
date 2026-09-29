@@ -52,8 +52,15 @@ export async function parseQuery(query: string, operatorCredentials?: { username
 }
 
 // ---------------------------------------------------------------------------
-// Phase 2 — AOI API
+// Phase 2 — AOI API & Auth Helpers
 // ---------------------------------------------------------------------------
+function _authHeader(username?: string, password?: string): string {
+  if (username && password) {
+    return `Basic ${btoa(`${username}:${password}`)}`;
+  }
+  return "";
+}
+
 function _headers(creds?: { username: string; password: string }, isJson: boolean = true): Record<string, string> {
   const h: Record<string, string> = {};
   if (isJson) {
