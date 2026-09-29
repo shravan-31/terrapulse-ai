@@ -1,6 +1,6 @@
 /**
  * frontend/src/App.tsx
- * TerraPulse AI — Autonomous Geospatial Intelligence & Change Detection Platform (SIH 26227)
+ * TerraPulse AI — Autonomous Geospatial Intelligence & Change Detection Platform
  *
  * Theme: Obsidian Deep Space & Electric Indigo / Cyber-Emerald
  * Modules:
@@ -75,7 +75,7 @@ export function App() {
                   TerraPulse<span className="text-indigo-400">.AI</span>
                 </span>
                 <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 uppercase font-semibold">
-                  SIH 26227
+                  ENTERPRISE
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 tracking-wider">
@@ -177,7 +177,7 @@ export function App() {
             <span className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
               System Settings
             </span>
-            <span className="text-[10px] font-mono text-indigo-400">SIH 26227</span>
+            <span className="text-[10px] font-mono text-indigo-400">v2.4.0</span>
           </div>
 
           <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">

@@ -296,7 +296,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
   const handleExportReport = () => {
     const reportData = {
       platform: "TerraPulse AI — Earth Observation Platform",
-      problem_statement: "SIH 26227",
+      system_edition: "Enterprise Edition v2.4",
       target_name: selectedTarget,
       coordinates: { latitude: coords[1], longitude: coords[0] },
       baseline_pass: baselineDate,

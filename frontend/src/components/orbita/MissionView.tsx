@@ -118,7 +118,7 @@ export const MissionView: React.FC<MissionViewProps> = ({ onNavigate }) => {
           <div className="flex-1 flex flex-col gap-6 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-950/70 border border-indigo-500/40 text-indigo-300 text-xs font-mono tracking-wide w-fit">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>SIH 26227 · AUTONOMOUS EARTH OBSERVATION PLATFORM</span>
+              <span>AUTONOMOUS EARTH OBSERVATION & SATELLITE INTELLIGENCE</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
