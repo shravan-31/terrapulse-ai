@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #060913;
+  color: #F8FAFC;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Sleek Scrollbar in Electric Indigo */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(8, 12, 24, 0.7);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.65);
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(13, 19, 36, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(99, 102, 241, 0.16);
+}
+
+.glass-card {
+  background: rgba(17, 24, 48, 0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+}
+
+.indigo-glow {
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
+}
+
+.indigo-glow-sm {
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.25);
+}
+
+.emerald-glow {
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+}
+
+.violet-border-glow {
+  border-color: rgba(129, 140, 248, 0.5);
+  box-shadow: 0 0 14px rgba(129, 140, 248, 0.25);
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.9; }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes radarSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radar-sweep {
+  animation: radarSpin 6s linear infinite;
+}

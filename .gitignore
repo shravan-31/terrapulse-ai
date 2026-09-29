@@ -1,0 +1,50 @@
+# .gitignore — SatQuery AI
+
+# Secrets and local config
+.env
+*.env.local
+
+# Downloaded data and models (large; not source-controlled)
+data/
+models/
+indexes/
+reports/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+
+# Alembic generated files that reference secrets are never committed
+# (alembic.ini is committed but must not contain real DATABASE_URL)
+
+# Temporary files
+*.tmp
+*.partial
