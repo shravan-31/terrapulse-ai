@@ -14,6 +14,7 @@ import {
   Box,
   Eye,
   CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -114,6 +115,28 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
     lng: 78.9629,
     zoom: 4.8,
   });
+  const [permissionBlocked, setPermissionBlocked] = useState(false);
+
+  // Monitor browser geolocation permission state
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then((perm) => {
+          if (perm.state === "denied") {
+            setPermissionBlocked(true);
+          }
+          perm.onchange = () => {
+            if (perm.state === "granted") {
+              setPermissionBlocked(false);
+            } else if (perm.state === "denied") {
+              setPermissionBlocked(true);
+            }
+          };
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -259,16 +282,21 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
+        setPermissionBlocked(false);
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        const accuracy = Math.round(pos.coords.accuracy || 20);
-        applyDetectedLocation(lat, lng, accuracy, `Device GPS Fix (±${accuracy}m)`, "gps");
+        const accuracy = Math.round(pos.coords.accuracy || 10);
+        applyDetectedLocation(lat, lng, accuracy, `Your Live Device Location (±${accuracy}m)`, "gps");
       },
-      async (_err) => {
-        // Automatically switch to IP Geolocation when browser GPS is blocked, dismissed, or times out
+      async (err) => {
+        if (err.code === 1) {
+          // User or browser blocked permission
+          setPermissionBlocked(true);
+        }
+        // Fallback to IP geolocation so map still centers on user's city
         await tryIPFallback();
       },
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
   };
 
@@ -452,6 +480,33 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
               <MapPin className="w-4 h-4 text-cyan-200" />
               <span>{locating ? "Acquiring Device GPS Fix..." : "📍 USE MY LOCATION"}</span>
             </button>
+
+            {/* Browser Permission Blocked Guide */}
+            {permissionBlocked && (
+              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-500/60 text-amber-200 text-xs flex flex-col gap-2.5 animate-fadeIn shadow-lg">
+                <div className="flex items-center gap-2 text-amber-300 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Browser Location Access Blocked</span>
+                </div>
+                <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                  तुमच्या ब्राउझरने (Chrome/Edge) लोकेशन ब्लॉक केले आहे. थेट तुमच्या घरावर/जागेवर झूम करण्यासाठी:
+                </p>
+                <div className="p-2.5 rounded-lg bg-black/50 border border-amber-500/30 font-mono text-[11px] space-y-1.5 text-slate-200">
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-amber-400 font-bold">1.</span>
+                    <span>ब्राउझर URL च्या डाव्या बाजूला <b>🔒 किंवा ⚙️ चिन्ह</b> वर क्लिक करा.</span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-amber-400 font-bold">2.</span>
+                    <span><b>Location</b> पर्याय <b>"Allow" (चालू)</b> करा.</span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-amber-400 font-bold">3.</span>
+                    <span>पेज <b>Reload</b> करा आणि परत <b>USE MY LOCATION</b> दाबा.</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Location & Local Archive Notice */}
             {userLocation && (

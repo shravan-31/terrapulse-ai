@@ -5,7 +5,7 @@ REM =========================================================================
 cd /d "%~dp0"
 
 echo =========================================================================
-echo   TerraPulse AI - Pushing Live Location Fix & Updates to GitHub
+echo   TerraPulse AI - Pushing Permission Guide & Live GPS Updates to GitHub
 echo =========================================================================
 echo.
 
@@ -15,7 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "fix(geolocation): add automatic IP-based location fallback, dynamic live marker and direct investigation routing"
+git commit -m "feat(location): add visual browser permission guide, reactive permission listener and high-accuracy GPS targeting"
 
 echo.
 echo [3/3] Pushing to GitHub...
