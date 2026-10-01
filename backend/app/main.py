@@ -59,8 +59,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 # ---------------------------------------------------------------------------
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="SatQuery AI",
-        description="Semantic Retrieval and Multi-Temporal Change Analysis of Satellite Imagery — SIH 26227",
+        title="TerraPulse AI",
+        description="Autonomous Earth Observation & Multi-Temporal Change Intelligence Platform",
         version="0.1.0",
         docs_url="/api/docs" if settings.app_env == "development" else None,
         redoc_url="/api/redoc" if settings.app_env == "development" else None,

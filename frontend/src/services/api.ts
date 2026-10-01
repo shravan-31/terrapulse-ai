@@ -413,4 +413,58 @@ export async function fetchProvenance(
   return (data.lineage || data.records || []) as ProvenanceRecord[];
 }
 
+export interface ClusterMember {
+  tile_id: string;
+  vector_id: number;
+  scene_product_id: string;
+  acquisition_at: string;
+  bbox: number[];
+  similarity_to_centroid: number;
+  preview_url: string;
+}
+
+export interface DiscoveredCluster {
+  cluster_id: number;
+  label: string;
+  tile_count: number;
+  cohesion_score: number;
+  representative_tile: {
+    tile_id: string;
+    scene_product_id: string;
+    preview_url: string;
+    bbox: number[];
+  };
+  members: ClusterMember[];
+}
+
+export interface ClusteringResponse {
+  total_tiles_clustered: number;
+  clusters_formed: number;
+  clusters: DiscoveredCluster[];
+  request_id?: string;
+}
+
+export async function fetchClusters(
+  aoiId?: string,
+  kClusters: number = 5,
+  creds?: { username: string; password: string }
+): Promise<ClusteringResponse> {
+  const headers: Record<string, string> = {};
+  if (creds) {
+    headers["Authorization"] = _authHeader(creds.username, creds.password);
+  }
+  const params = new URLSearchParams();
+  if (aoiId) params.append("aoi_id", aoiId);
+  params.append("k_clusters", kClusters.toString());
+
+  const resp = await fetch(`/api/search/clusters?${params.toString()}`, {
+    method: "POST",
+    headers,
+  });
+  if (!resp.ok) {
+    throw new Error(`Clustering discovery failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
 

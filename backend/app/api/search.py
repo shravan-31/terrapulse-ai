@@ -256,3 +256,29 @@ async def get_similar_tiles(
             "request_id": request_id,
         }
     )
+
+
+@router.post("/clusters")
+async def cluster_sites(
+    aoi_id: str | None = Query(None, description="Optional AOI UUID filter"),
+    k_clusters: int = Query(5, ge=2, le=20, description="Target cluster count"),
+    min_cluster_size: int = Query(1, ge=1, description="Minimum tiles per cluster"),
+    request: Request = None,
+    db: AsyncSession = Depends(get_db),
+) -> JSONResponse:
+    """
+    Unsupervised Discovery & Clustering (SIH 26227 § 2.2.4).
+    Groups indexed sites into semantic clusters across an AOI or archive.
+    """
+    from app.services.clustering_service import ClusteringService
+
+    request_id = getattr(request.state, "request_id", str(uuid.uuid4())) if request else str(uuid.uuid4())
+    clustering_svc = ClusteringService(db=db)
+    
+    result = await clustering_svc.cluster_tiles(
+        aoi_id=aoi_id,
+        k_clusters=k_clusters,
+        min_cluster_size=min_cluster_size,
+    )
+    result["request_id"] = request_id
+    return JSONResponse(content=result)

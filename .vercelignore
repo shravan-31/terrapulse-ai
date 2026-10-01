@@ -1,0 +1,24 @@
+# Ignore backend, ML models, and heavy geospatial datasets from Vercel deployments
+backend/
+data/
+indexes/
+reports/
+doc/
+docs/
+scripts/
+conftest.py
+pytest.ini
+docker-compose.yml
+.pytest_cache/
+venv/
+.venv/
+**/__pycache__/
+*.pt
+*.pth
+*.onnx
+*.tif
+*.tiff
+*.zip
+*.tar.gz
+*.h5
+*.log

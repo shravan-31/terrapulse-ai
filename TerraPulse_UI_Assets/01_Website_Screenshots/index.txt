@@ -1,0 +1,10 @@
+# TerraPulse UI Assets - Website Screenshots
+This folder contains high-resolution (1920x1080) screenshots captured directly from the live prototype:
+https://terrapulse-ai-gules.vercel.app/
+
+Screenshots:
+- 01_Home_Dashboard.png: Live landing page with 3D Earth simulation, key specs, architecture stack, and telemetry status.
+- 02_Semantic_Search.png: Semantic AI Intelligence view with natural language query bar, FAISS vector catalog, similarity match scores (95.1%), and spatial map plotting.
+- 03_Change_Detection.png: Investigation view showing Sentinel-2 satellite pass comparison, interactive swipe splitter, baseline/inspection dates, and altered area metrics.
+- 04_Analyst_Review.png: Analyst Verification & Certification controls (Confirm Genuine Change / Dismiss False Alarm) alongside AI Analysis Agent report and confidence metrics (96.4%).
+- 05_Other_Features.png: Surveillance Mission Control view with 63 monitored sectors, active telemetry, and sector inspection list.

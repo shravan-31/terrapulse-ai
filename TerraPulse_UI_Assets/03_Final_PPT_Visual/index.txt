@@ -1,0 +1,15 @@
+# TerraPulse UI Assets - Final PPT Visual
+Smart India Hackathon (SIH 2026) Prototype Showcase Visual
+
+Slide Specifications:
+- Layout: 16:9 Aspect Ratio (1920x1080)
+- Theme: SIH Official Emerald Green border & Dark Navy typography on pure white background
+- Main Title: Sample UI developed by the team
+- Subtitle: Live Prototype — TerraPulse AI • terrapulse-ai-gules.vercel.app
+- Card 1: Semantic Search (Real UI from prototype)
+- Card 2: Change Detection (Real UI from prototype)
+- Card 3: Analyst Review (Real UI from prototype)
+
+Files:
+- TerraPulse_Sample_UI.png
+- TerraPulse_Sample_UI.jpg

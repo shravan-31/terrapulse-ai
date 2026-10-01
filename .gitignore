@@ -7,8 +7,9 @@
 # Downloaded data and models (large; not source-controlled)
 data/
 models/
-indexes/
 reports/
+!reports/*.md
+!reports/*.json
 
 # Python
 __pycache__/
@@ -48,3 +49,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.partial
+
+.vercel
+.env*

@@ -248,12 +248,15 @@ Gate states: `PASSED` · `FAILED` · `BLOCKED` · `NOT RUN`
 
 ---
 
-## Phase 9 — Similar Sites
-> Master prompt §§8, 17.
+## Phase 9 — Similar Sites, Discovery & Clustering
+> Master prompt §§8, 17. SIH 26227 § 2.2.4.
 
 - [x] `GET /api/search/similar/{tile_id}` — FAISS neighbors + spatial/active filter (`backend/app/api/search.py`)
 - [x] Exclude: query tile, overlapping tiles, nearby duplicates; suppression policy in response
-- [x] Tests: verified in `test_search_api.py`
+- [x] `POST /api/search/clusters` — Spherical K-Means unsupervised clustering on 768-d RemoteCLIP embeddings across AOI (`backend/app/services/clustering_service.py`, `backend/app/api/search.py`)
+- [x] Zero-shot semantic anchor labeling (`Built-up Infrastructure`, `Excavation & Bare Ground`, `Dense Canopy`, `Agricultural Fields`, `Water Networks`, `Transportation`)
+- [x] Frontend `SearchResultsPanel.tsx` interactive Discovery & Clustering tab with representative medoid inspection
+- [x] Tests: verified in `test_search_api.py` and `test_clustering.py`
 
 ---
 

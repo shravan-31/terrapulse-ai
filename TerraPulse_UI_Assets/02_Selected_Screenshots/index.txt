@@ -1,0 +1,14 @@
+# TerraPulse UI Assets - Selected Screenshots
+The three key workflow screens selected from the live prototype:
+
+1. Search.jpg / Search.png
+   → Semantic Search interface (Natural-Language Earth Query & FAISS catalog)
+
+2. Change.jpg / Change.png
+   → Change Detection interface (Multi-temporal satellite pass comparison with swipe splitter)
+
+3. Review.jpg / Review.png
+   → Analyst Review interface (Analyst verification certification controls and confidence metrics)
+
+Both JPG and PNG high-resolution formats are supported.
+To refresh or synchronize directly from source captures, execute sync_assets.bat or sync_assets.ps1.

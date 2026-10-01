@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraPulse AI — Sample UI developed by the team (SIH 2026)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .slide-wrapper {
+      width: 100%;
+      max-width: 1920px;
+      aspect-ratio: 16 / 9;
+      background: #ffffff;
+      border: 8px solid #059669;
+      border-radius: 28px;
+      box-shadow: 0 25px 60px -15px rgba(5, 150, 105, 0.15), 0 10px 25px rgba(0, 0, 0, 0.05);
+      padding: 50px 60px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .main-title {
+      font-size: 52px;
+      font-weight: 800;
+      color: #0b192c;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .subtitle-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #475569;
+    }
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+    .prototype-url {
+      font-family: 'JetBrains Mono', monospace;
+      color: #059669;
+      background: #ecfdf5;
+      padding: 3px 12px;
+      border-radius: 8px;
+      border: 1px solid #a7f3d0;
+      font-size: 17px;
+    }
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px;
+      flex: 1;
+      min-height: 0;
+    }
+    .ui-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .ui-card:hover {
+      box-shadow: 0 16px 36px rgba(5, 150, 105, 0.08);
+      border-color: #cbd5e1;
+    }
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1.5px solid #f1f5f9;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+    .card-tag {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+    .tag-green {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #bbf7d0;
+    }
+    .tag-purple {
+      background: #f3e8ff;
+      color: #7e22ce;
+      border-color: #e9d5ff;
+    }
+    .card-body {
+      flex: 1;
+      background: #060913;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-body img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .sih-footer {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+      color: #64748b;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .team-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #059669;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-wrapper">
+    <div class="slide-header">
+      <h1 class="main-title">Sample UI developed by the team</h1>
+      <div class="subtitle-badge">
+        <span class="live-dot"></span>
+        <span>Live Prototype — TerraPulse AI</span>
+        <span>•</span>
+        <span class="prototype-url">terrapulse-ai-gules.vercel.app</span>
+      </div>
+    </div>
+
+    <div class="cards-container">
+      <!-- Card 1: Semantic Search -->
+      <div class="ui-card">
+        <div class="card-header">
+          <h2 class="card-title">Semantic Search</h2>
+          <span class="card-tag tag-purple">Natural Language</span>
+        </div>
+        <div class="card-body">
+          <img src="../../02_Selected_Screenshots/Search.png" alt="Semantic Search Interface">
+        </div>
+      </div>
+
+      <!-- Card 2: Change Detection -->
+      <div class="ui-card">
+        <div class="card-header">
+          <h2 class="card-title">Change Detection</h2>
+          <span class="card-tag tag-green">Sentinel-2 Multi-Pass</span>
+        </div>
+        <div class="card-body">
+          <img src="../../02_Selected_Screenshots/Change.png" alt="Change Detection Swipe Splitter">
+        </div>
+      </div>
+
+      <!-- Card 3: Analyst Review -->
+      <div class="ui-card">
+        <div class="card-header">
+          <h2 class="card-title">Analyst Review</h2>
+          <span class="card-tag">AI Certification</span>
+        </div>
+        <div class="card-body">
+          <img src="../../02_Selected_Screenshots/Review.png" alt="Analyst Verification Panel">
+        </div>
+      </div>
+    </div>
+
+    <div class="sih-footer">
+      <div class="team-badge">
+        <span>Smart India Hackathon 2026</span>
+        <span>•</span>
+        <span>Problem Statement: Autonomous Earth Observation & Change Intelligence</span>
+      </div>
+      <div>
+        <span>Status: Production Verified Prototype</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
