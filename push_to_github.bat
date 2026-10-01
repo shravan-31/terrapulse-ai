@@ -5,7 +5,7 @@ REM =========================================================================
 cd /d "%~dp0"
 
 echo =========================================================================
-echo   TerraPulse AI - Pushing Localhost & Overview Fixes to GitHub
+echo   TerraPulse AI - Pushing Live Location Fix & Updates to GitHub
 echo =========================================================================
 echo.
 
@@ -15,7 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "fix(localhost): add 1-click launchers, Python 3.13 server deps, OverviewView telemetry state & graceful proxy handling"
+git commit -m "fix(geolocation): add automatic IP-based location fallback, dynamic live marker and direct investigation routing"
 
 echo.
 echo [3/3] Pushing to GitHub...

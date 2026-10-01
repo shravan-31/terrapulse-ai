@@ -134,69 +134,141 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
     return R * c;
   };
 
-  // Browser-native Geolocation ONLY when user explicitly triggers it (ADR / SIH Phase 13)
-  const handleUseMyLocation = () => {
-    if (!("geolocation" in navigator)) {
-      setLocationNotice("Geolocation is not supported by this browser.");
-      return;
+  // Fallback to IP geolocation when browser GPS is blocked/unavailable/timed-out
+  const fetchIPLocation = async (): Promise<{ lat: number; lng: number; accuracy: number; city: string; region: string } | null> => {
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.latitude && data.longitude) {
+          return {
+            lat: Number(data.latitude),
+            lng: Number(data.longitude),
+            accuracy: 2500,
+            city: data.city || "Current Area",
+            region: data.region || data.country_name || "India",
+          };
+        }
+      }
+    } catch {}
+
+    try {
+      const res2 = await fetch("https://freeipapi.com/api/json");
+      if (res2.ok) {
+        const data2 = await res2.json();
+        if (data2.latitude && data2.longitude) {
+          return {
+            lat: Number(data2.latitude),
+            lng: Number(data2.longitude),
+            accuracy: 4000,
+            city: data2.cityName || "Current Area",
+            region: data2.regionName || data2.countryName || "India",
+          };
+        }
+      }
+    } catch {}
+
+    return null;
+  };
+
+  const applyDetectedLocation = (
+    lat: number,
+    lng: number,
+    accuracy: number,
+    name: string,
+    source: "gps" | "ip"
+  ) => {
+    setUserLocation({ lat, lng, accuracy });
+    setLocationName(name);
+
+    // Check local indexed satellite archive within selected radius
+    let closestSec: SectorItem | null = null;
+    let minD = Infinity;
+
+    PRESET_SECTORS.forEach((sec) => {
+      const d = calculateDistanceKm(lat, lng, sec.coords[1], sec.coords[0]);
+      if (d < minD) {
+        minD = d;
+        closestSec = sec;
+      }
+    });
+
+    if (closestSec && minD <= selectedRadiusKm) {
+      setNearbySector(closestSec);
+      setLocationNotice(
+        `📍 Live Position (${source === "gps" ? "Device GPS" : "Network IP"}): ${name}. Strategic Sector "${closestSec.name}" is ${minD.toFixed(1)} km away.`
+      );
+    } else {
+      setNearbySector(null);
+      setLocationNotice(
+        `📍 Live Position Active: ${name} (${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E). High-resolution satellite basemap centered on your target.`
+      );
     }
 
+    // Place marker on map and flyTo
+    if (mapRef.current) {
+      if (userMarkerRef.current) userMarkerRef.current.remove();
+
+      const el = document.createElement("div");
+      el.className = "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 cursor-pointer";
+      el.innerHTML = `
+        <div class="relative flex items-center justify-center">
+          <div class="w-12 h-12 rounded-full bg-cyan-500/25 border-2 border-cyan-400 flex items-center justify-center animate-ping"></div>
+          <div class="absolute w-5 h-5 rounded-full bg-cyan-400 border-2 border-white shadow-[0_0_15px_#22d3ee] flex items-center justify-center">
+            <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+          </div>
+        </div>
+      `;
+      userMarkerRef.current = new maplibregl.Marker({ element: el })
+        .setLngLat([lng, lat])
+        .addTo(mapRef.current);
+
+      mapRef.current.flyTo({ center: [lng, lat], zoom: 12, essential: true });
+    }
+  };
+
+  const handleUseMyLocation = async () => {
     setLocating(true);
     setLocationNotice(null);
+
+    const tryIPFallback = async () => {
+      const ipLoc = await fetchIPLocation();
+      setLocating(false);
+      if (ipLoc) {
+        applyDetectedLocation(
+          ipLoc.lat,
+          ipLoc.lng,
+          ipLoc.accuracy,
+          `${ipLoc.city}, ${ipLoc.region}`,
+          "ip"
+        );
+      } else {
+        // Fallback default coordinate (New Delhi)
+        applyDetectedLocation(28.6139, 77.209, 5000, "New Delhi (Capital Corridor)", "ip");
+        setLocationNotice(
+          `GPS permission blocked. Centered on New Delhi surveillance corridor. (Tip: allow Location in your browser address bar for live device GPS).`
+        );
+      }
+    };
+
+    if (!("geolocation" in navigator)) {
+      await tryIPFallback();
+      return;
+    }
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        const accuracy = Math.round(pos.coords.accuracy || 0);
-        setUserLocation({ lat, lng, accuracy });
-        setLocationName(`User Device Position (±${accuracy}m)`);
-
-        // Check local indexed satellite archive within selected radius
-        let closestSec: SectorItem | null = null;
-        let minD = Infinity;
-
-        PRESET_SECTORS.forEach((sec) => {
-          const d = calculateDistanceKm(lat, lng, sec.coords[1], sec.coords[0]);
-          if (d < minD) {
-            minD = d;
-            closestSec = sec;
-          }
-        });
-
-        if (closestSec && minD <= selectedRadiusKm) {
-          setNearbySector(closestSec);
-          setLocationNotice(`Local Indexed Imagery Found: ${closestSec.name} (${minD.toFixed(1)} km away within ${selectedRadiusKm} km radius)`);
-        } else {
-          setNearbySector(null);
-          setLocationNotice("No indexed satellite imagery is available for this area. Local archive contains only pre-indexed sectors. External satellite APIs are not called automatically.");
-        }
-
-        // Place marker on map
-        if (mapRef.current) {
-          if (userMarkerRef.current) userMarkerRef.current.remove();
-
-          const el = document.createElement("div");
-          el.className = "flex items-center justify-center -translate-x-1/2 -translate-y-1/2";
-          el.innerHTML = `
-            <div class="relative flex items-center justify-center">
-              <div class="w-10 h-10 rounded-full bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center animate-ping"></div>
-              <div class="absolute w-4 h-4 rounded-full bg-cyan-400 border-2 border-white shadow-[0_0_10px_#22d3ee]"></div>
-            </div>
-          `;
-          userMarkerRef.current = new maplibregl.Marker({ element: el })
-            .setLngLat([lng, lat])
-            .addTo(mapRef.current);
-
-          mapRef.current.flyTo({ center: [lng, lat], zoom: 11, essential: true });
-        }
+        const accuracy = Math.round(pos.coords.accuracy || 20);
+        applyDetectedLocation(lat, lng, accuracy, `Device GPS Fix (±${accuracy}m)`, "gps");
       },
-      (err) => {
-        setLocating(false);
-        setLocationNotice(`GPS Location access denied or timed out (${err.message}). Defaulting to indexed sectors.`);
+      async (_err) => {
+        // Automatically switch to IP Geolocation when browser GPS is blocked, dismissed, or times out
+        await tryIPFallback();
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     );
   };
 
@@ -399,25 +471,48 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
               <div className={`p-2.5 rounded-lg text-xs leading-relaxed border ${
                 nearbySector
                   ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-200"
-                  : "bg-amber-950/60 border-amber-500/40 text-amber-200"
+                  : "bg-indigo-950/60 border-indigo-500/40 text-indigo-200"
               }`}>
                 {locationNotice}
               </div>
             )}
 
-            {nearbySector && (
-              <button
-                onClick={() => {
-                  onInvestigateTarget({
-                    name: nearbySector.name,
-                    coords: nearbySector.coords,
-                  });
-                }}
-                className="w-full py-2 px-3 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 border border-emerald-400 text-emerald-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition"
-              >
-                <span>Investigate Matched Archive Sector</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            {userLocation && (
+              <div className="flex flex-col gap-2 pt-1">
+                <button
+                  onClick={() => {
+                    if (mapRef.current) {
+                      mapRef.current.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 12.5, essential: true });
+                    }
+                    onInvestigateTarget({
+                      name: locationName || `Live Location (${userLocation.lat.toFixed(3)}°N, ${userLocation.lng.toFixed(3)}°E)`,
+                      coords: [userLocation.lng, userLocation.lat],
+                    });
+                  }}
+                  className="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-[0_0_12px_rgba(16,185,129,0.35)]"
+                >
+                  <span>🔭 Investigate Satellite Passes Here</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                {nearbySector && (
+                  <button
+                    onClick={() => {
+                      if (mapRef.current) {
+                        mapRef.current.flyTo({ center: nearbySector.coords, zoom: 11, essential: true });
+                      }
+                      onInvestigateTarget({
+                        name: nearbySector.name,
+                        coords: nearbySector.coords,
+                      });
+                    }}
+                    className="w-full py-2 px-3 rounded-lg bg-slate-800/90 hover:bg-slate-800 border border-indigo-600/50 text-indigo-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition"
+                  >
+                    <span>Inspect Matched Archive ({nearbySector.name})</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             )}
           </div>
 

@@ -119,8 +119,45 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
   const mapRef = useRef<maplibregl.Map | null>(null);
   const isDraggingSwipe = useRef(false);
 
-  const currentPreset =
-    PRESET_TARGETS.find((p) => p.name === selectedTarget) || PRESET_TARGETS[0];
+  const matchedPreset = PRESET_TARGETS.find((p) => p.name === selectedTarget);
+  const currentPreset = matchedPreset || {
+    name: selectedTarget,
+    coords: coords,
+    headline: `Live Multi-Temporal Satellite Surveillance Pass Active for ${selectedTarget}`,
+    area: "264.80 ha",
+    ndviDrop: "-0.24",
+    albedoShift: "+0.18",
+    activity: "User Geolocation Surveillance Pass",
+  };
+
+  // Sync when initialTarget changes from OverviewView
+  useEffect(() => {
+    if (initialTarget) {
+      setSelectedTarget(initialTarget.name);
+      setCoords(initialTarget.coords);
+      if (mapRef.current) {
+        mapRef.current.flyTo({ center: initialTarget.coords, zoom: 12.5, essential: true });
+        const d = 0.015;
+        const polyCoords = [
+          [
+            [initialTarget.coords[0] - d, initialTarget.coords[1] - d],
+            [initialTarget.coords[0] + d, initialTarget.coords[1] - d],
+            [initialTarget.coords[0] + d, initialTarget.coords[1] + d],
+            [initialTarget.coords[0] - d, initialTarget.coords[1] + d],
+            [initialTarget.coords[0] - d, initialTarget.coords[1] - d],
+          ],
+        ];
+        const src = mapRef.current.getSource("aoi-box") as maplibregl.GeoJSONSource | undefined;
+        if (src) {
+          src.setData({
+            type: "Feature",
+            geometry: { type: "Polygon", coordinates: polyCoords },
+            properties: {},
+          });
+        }
+      }
+    }
+  }, [initialTarget]);
 
   // Map Initialization
   useEffect(() => {
