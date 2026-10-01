@@ -104,6 +104,19 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
   const [locating, setLocating] = useState(false);
   const [locationNotice, setLocationNotice] = useState<string | null>(null);
   const [nearbySector, setNearbySector] = useState<SectorItem | null>(null);
+  const [locationName, setLocationName] = useState<string | null>(null);
+  const [passCheckingId, setPassCheckingId] = useState<string | null>(null);
+  const [passScheduleMessage, setPassScheduleMessage] = useState<string | null>(null);
+  const [drawingMode, setDrawingMode] = useState(false);
+  const [mapPitch3D, setMapPitch3D] = useState(false);
+  const [coordsTelemetry, setCoordsTelemetry] = useState<{ lat: number; lng: number; zoom: number }>({
+    lat: 22.5937,
+    lng: 78.9629,
+    zoom: 4.8,
+  });
+
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
 
   // Helper: Haversine distance in km

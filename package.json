@@ -1,0 +1,12 @@
+{
+  "name": "terrapulse-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TerraPulse AI — Semantic Retrieval and Multi-Temporal Change Analysis of Satellite Imagery",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "deploy": "npm --prefix frontend run build && npx vercel --prod"
+  }
+}

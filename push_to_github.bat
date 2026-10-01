@@ -5,7 +5,7 @@ REM =========================================================================
 cd /d "%~dp0"
 
 echo =========================================================================
-echo   TerraPulse AI - Pushing Final SIH 26227 Verification to GitHub
+echo   TerraPulse AI - Pushing Localhost & Overview Fixes to GitHub
 echo =========================================================================
 echo.
 
@@ -15,7 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "feat(sih26227): final production readiness, trained ChangeFormer checkpoint (8.08MB, 87.27%% F1), false-alarm suppression, and reproducibility audit"
+git commit -m "fix(localhost): add 1-click launchers, Python 3.13 server deps, OverviewView telemetry state & graceful proxy handling"
 
 echo.
 echo [3/3] Pushing to GitHub...
