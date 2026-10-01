@@ -4,6 +4,7 @@
 ### Autonomous Geospatial Intelligence & Multi-Temporal Change Detection Platform
 **Smart India Hackathon (SIH 2026) · Problem Statement: SIH 26227**
 
+[![Live Prototype](https://img.shields.io/badge/Live_Deployment-terrapulse--ai--gules.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://terrapulse-ai-gules.vercel.app/)
 [![Copernicus Sentinel-2](https://img.shields.io/badge/Copernicus-Sentinel--2_L2A-blue?style=for-the-badge&logo=satellite)](https://dataspace.copernicus.eu/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React Vite](https://img.shields.io/badge/Frontend-React_18_+_Vite-61DAFB?style=for-the-badge&logo=react)](https://vitejs.dev/)
@@ -13,6 +14,8 @@
 
 <br/>
 
+> 🌐 **Live Cloud Prototype**: **[https://terrapulse-ai-gules.vercel.app/](https://terrapulse-ai-gules.vercel.app/)**
+> 
 > **Continuously monitor ground targets, detect infrastructure development, and analyze surface modifications using multispectral satellite passes and verified AI change intelligence.**
 
 </div>
@@ -48,12 +51,13 @@ Addressing **SIH 26227**, TerraPulse combines **Copernicus Sentinel-2 multispect
 - **Interactive MapLibre GL**: 2D Flat / 3D Oblique tilt controls, satellite hybrid basemap, live coordinate telemetry bar (`LAT`, `LNG`, `ZOOM`, `CRS: WGS84`).
 - **Sentinel-2 Orbit Scheduler**: Real-time pass lookahead displaying upcoming orbits, sun elevation, and cloud probability.
 
-### 4. 🧠 Semantic Natural-Language Earth Query
+### 4. 🧠 Semantic Natural-Language Earth Query & Site Discovery
 - Text-to-image semantic search powered by **RemoteCLIP** embeddings and **FAISS** vector indexing.
 - Search satellite archives with prompts such as:
   - *"Show me open-pit excavation and earthmoving sites"*
   - *"Where did new structural construction occur?"*
   - *"Which areas changed the most across surveillance sectors?"*
+- **Unsupervised Site Clustering (SIH 2.2.4)**: Spherical K-Means grouping over 768-d unit embeddings with zero-shot semantic theme tagging (`Built-up Infrastructure`, `Excavation & Bare Ground`, `Dense Canopy`, `Agricultural Fields`, `Water Networks`, `Transportation`) allowing analysts to discover comparable sites across regional AOIs in 1 click.
 - Spatial marker clustering and vector polygon footprint overlays.
 
 ### 5. 🛡️ Human-in-the-Loop Analyst Certification
