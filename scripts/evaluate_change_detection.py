@@ -17,10 +17,12 @@ from pathlib import Path
 import numpy as np
 import torch
 
-BACKEND_DIR = Path(__file__).resolve().parent.parent / "backend"
-sys.path.insert(0, str(BACKEND_DIR))
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(WORKSPACE_ROOT))
+sys.path.insert(0, str(WORKSPACE_ROOT / "backend"))
 
 from scripts.train_change_detection import (
+
     CalibratedSyntheticDataset,
     SiameseChangeDetector,
     compute_metrics,
@@ -52,11 +54,21 @@ def evaluate_checkpoint(
         except Exception as e:
             print(f"Warning: Could not load state_dict directly ({e}); evaluating baseline weights")
 
-    model.eval()
+    from scripts.train_change_detection import LevirCDZipDataset
+    
+    levir_test_zip = Path(__file__).resolve().parent.parent / "data" / "levir_cd" / "test.zip"
+    if levir_test_zip.exists():
+        print(f"Loading real LEVIR-CD held-out test pairs from {levir_test_zip}...")
+        test_ds = LevirCDZipDataset(levir_test_zip, split="test", patch_size=256, max_samples=test_size)
+        dataset_name = "Real LEVIR-CD Held-Out Test Set"
+    else:
+        print(f"Archive not found, using calibrated evaluation split...")
+        test_ds = CalibratedSyntheticDataset(size=test_size, seed=9999)
+        dataset_name = "Calibrated Held-Out Benchmark"
 
-    # Held-out test set
-    test_ds = CalibratedSyntheticDataset(size=test_size, seed=9999)
+    actual_test_size = len(test_ds)
     loader = torch.utils.data.DataLoader(test_ds, batch_size=4, shuffle=False)
+
 
     preds, targets = [], []
     t0 = time.time()
@@ -74,11 +86,12 @@ def evaluate_checkpoint(
     all_targets = np.concatenate(targets, axis=0)
 
     metrics = compute_metrics(all_preds, all_targets)
-    metrics["test_samples"] = test_size
+    metrics["test_samples"] = actual_test_size
     metrics["inference_time_total_s"] = round(inference_duration, 3)
-    metrics["avg_latency_ms_per_pair"] = round((inference_duration / test_size) * 1000, 2)
+    metrics["avg_latency_ms_per_pair"] = round((inference_duration / max(1, actual_test_size)) * 1000, 2)
     metrics["checkpoint_evaluated"] = str(checkpoint_path.name)
-    metrics["dataset_benchmarked"] = "LEVIR-CD & OSCD Held-Out Benchmark"
+    metrics["dataset_benchmarked"] = dataset_name
+
 
     print("\n--- Held-Out Test Metrics ---")
     for k, v in metrics.items():

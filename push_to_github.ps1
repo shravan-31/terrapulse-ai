@@ -12,7 +12,8 @@ git add .
 git status --short
 
 Write-Host "`n[2/3] Creating commit..." -ForegroundColor Yellow
-git commit -m "fix(geolocation): add automatic IP-based location fallback, dynamic live marker and direct investigation routing"
+git commit -m "feat(siamese-cd): integrate trained ChangeFormerV6 model, live model metrics card, and SIH 26227 semantic queries"
+
 
 Write-Host "`n[3/3] Pushing to origin main..." -ForegroundColor Yellow
 git push origin main

@@ -306,6 +306,15 @@ export async function reviewChange(
   return resp.json();
 }
 
+export async function fetchChangeModelInfo(): Promise<any> {
+  const resp = await fetch("/api/change/model-info");
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch model info: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+
 // ---------------------------------------------------------------------------
 // Phase 7 & 8 — Multi-Temporal Timeline & Hypotheses API
 // ---------------------------------------------------------------------------

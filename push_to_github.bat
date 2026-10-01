@@ -15,7 +15,8 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "feat(location): add visual browser permission guide, reactive permission listener and high-accuracy GPS targeting"
+git commit -m "feat(siamese-cd): integrate trained ChangeFormerV6 model, live model metrics card, and SIH 26227 semantic queries"
+
 
 echo.
 echo [3/3] Pushing to GitHub...

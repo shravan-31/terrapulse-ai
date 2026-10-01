@@ -191,9 +191,10 @@ class Settings(BaseSettings):
     remoteclip_sha256: str | None = None
     remoteclip_embedding_dim: int = 768
 
-    changeformer_checkpoint_path: str = "./models/changeformer/ChangeFormer_LEVIR.pth"
-    changeformer_sha256: str | None = None
+    changeformer_checkpoint_path: str = "./models/changeformer/ChangeFormerV6.pth"
+    changeformer_sha256: str | None = "a4b97cc372734c554fd5deac61ff5639741ee038ef63c3f3a556a91872f2c742"
     changeformer_training_dataset: str = "LEVIR-CD"
+
 
     # -------------------------------------------------------------------------
     # Compute

@@ -77,11 +77,21 @@ class ChangeFormerAdapter(ChangeDetectorModel):
             return
 
         if not self.checkpoint_path.exists():
-            raise ModelMissingError(
-                model_name="ChangeFormerV6",
-                message=f"ChangeFormer checkpoint not found at '{self.checkpoint_path}'.",
-                suggestion="Run `python scripts/download_models.py --changeformer` to download.",
-            )
+            # Robust fallback relative to workspace root
+            root_cand = Path(__file__).resolve().parent.parent.parent.parent / "models" / "changeformer" / "ChangeFormerV6.pth"
+            if root_cand.exists():
+                self.checkpoint_path = root_cand
+            else:
+                parent_cand = Path(__file__).resolve().parent.parent.parent / "models" / "changeformer" / "ChangeFormerV6.pth"
+                if parent_cand.exists():
+                    self.checkpoint_path = parent_cand
+                elif not self.checkpoint_path.exists():
+                    raise ModelMissingError(
+                        model_name="ChangeFormerV6",
+                        message=f"ChangeFormer checkpoint not found at '{self.checkpoint_path}'.",
+                        suggestion="Run `python scripts/download_models.py --changeformer` or training pipeline.",
+                    )
+
 
         log.info("Loading ChangeFormer weights", path=str(self.checkpoint_path))
         try:

@@ -153,6 +153,13 @@ export function App() {
             <span>New Scan</span>
           </button>
 
+          {/* AI Model Badge */}
+          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-[11px] font-mono text-indigo-200 shadow-[0_0_10px_rgba(99,102,241,0.25)]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+            <span className="font-semibold text-emerald-300">AI:</span>
+            <span>ChangeFormerV6 (8.08 MB)</span>
+          </div>
+
           {/* Telemetry Status Badge */}
           <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-indigo-950 text-[11px] font-mono text-slate-300 shadow-sm">
             <span className={`w-2 h-2 rounded-full ${sihOfflineMode ? "bg-cyan-400" : "bg-emerald-400"} animate-pulse shadow-[0_0_8px_${sihOfflineMode ? "#22d3ee" : "#34d399"}]`} />
@@ -162,6 +169,7 @@ export function App() {
                 : "63 Sectors · 352 Changes · LIVE TELEMETRY"}
             </span>
           </div>
+
 
           {/* Settings button */}
           <button

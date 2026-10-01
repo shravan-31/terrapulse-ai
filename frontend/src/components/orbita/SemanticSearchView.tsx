@@ -102,12 +102,14 @@ export const SemanticSearchView: React.FC<SemanticSearchViewProps> = ({ onInvest
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<DetectedChangeFootprint[]>(SAMPLE_FOOTPRINTS);
   const [recentQueries, setRecentQueries] = useState<Array<{ text: string; hits: number }>>([
-    { text: "Which areas changed the most across surveillance sectors?", hits: 14 },
+    { text: "newly built structures near a river", hits: 32 },
+    { text: "large vehicle concentrations on open ground", hits: 19 },
     { text: "Where did new structural construction occur?", hits: 28 },
-    { text: "Show me open-pit excavation and earthmoving sites.", hits: 9 },
-    { text: "Did any water bodies or reservoirs shift?", hits: 6 },
+    { text: "Show me open-pit excavation and earthmoving sites.", hits: 14 },
+    { text: "Did any water bodies or reservoirs shift?", hits: 8 },
     { text: "What changed in the Bhadla Solar Park sector?", hits: 18 },
   ]);
+
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -221,7 +223,13 @@ export const SemanticSearchView: React.FC<SemanticSearchViewProps> = ({ onInvest
       setLoading(false);
       const lq = q.toLowerCase();
       let matched = SAMPLE_FOOTPRINTS.filter((f) => {
-        if (lq.includes("excavation") || lq.includes("mining")) {
+        if (lq.includes("river") || lq.includes("water") || lq.includes("reservoir")) {
+          return f.summary.toLowerCase().includes("deepwater") || f.targetName.toLowerCase().includes("delhi") || f.activity.toLowerCase().includes("marine");
+        }
+        if (lq.includes("vehicle") || lq.includes("open ground")) {
+          return f.summary.toLowerCase().includes("stacking") || f.activity.toLowerCase().includes("logistics") || f.activity.toLowerCase().includes("highway");
+        }
+        if (lq.includes("excavation") || lq.includes("mining") || lq.includes("earthmoving")) {
           return f.activity.toLowerCase().includes("excavation") || f.activity.toLowerCase().includes("mining");
         }
         if (lq.includes("solar") || lq.includes("bhadla")) {
@@ -230,11 +238,12 @@ export const SemanticSearchView: React.FC<SemanticSearchViewProps> = ({ onInvest
         if (lq.includes("port") || lq.includes("mundra")) {
           return f.targetName.toLowerCase().includes("mundra");
         }
-        if (lq.includes("construction") || lq.includes("building")) {
+        if (lq.includes("construction") || lq.includes("building") || lq.includes("structure")) {
           return f.activity.toLowerCase().includes("construction") || f.activity.toLowerCase().includes("redevelopment");
         }
         return true;
       });
+
 
       if (matched.length === 0) matched = SAMPLE_FOOTPRINTS;
       setResults(matched);
