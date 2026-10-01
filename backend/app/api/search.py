@@ -22,6 +22,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from PIL import Image
+import numpy as np
 import structlog
 
 from app.core.database import get_db
@@ -200,11 +201,35 @@ async def image_search(
     scores, vector_ids = index_mgr.index.search(query_vector, top_k=top_k)
 
     results = []
-    for s, vid in zip(scores, vector_ids):
-        results.append({
-            "vector_id": int(vid),
-            "score": round(float(s), 4),
-        })
+    found_vids = [int(v) for v in vector_ids]
+    if found_vids:
+        stmt = (
+            select(Embedding.vector_id, Tile)
+            .join(Tile, Embedding.tile_id == Tile.id)
+            .options(selectinload(Tile.scene))
+            .where(Embedding.vector_id.in_(found_vids))
+        )
+        res = await db.execute(stmt)
+        v_to_tile = {row[0]: row[1] for row in res.all()}
+        
+        for s, vid in zip(scores, vector_ids):
+            t = v_to_tile.get(int(vid))
+            results.append({
+                "vector_id": int(vid),
+                "score": round(float(s), 4),
+                "tile_id": str(t.id) if t else None,
+                "bounds": t.bounds if t else None,
+                "scene_product_id": t.scene.product_id if (t and t.scene) else None,
+                "acquisition_at": t.scene.acquisition_at.isoformat() if (t and t.scene) else None,
+                "cloud_cover": t.scene.cloud_coverage_percent if (t and t.scene) else None,
+                "preview_url": f"/api/rasters/tiles/{t.id}/preview.png" if t else None,
+            })
+    else:
+        for s, vid in zip(scores, vector_ids):
+            results.append({
+                "vector_id": int(vid),
+                "score": round(float(s), 4),
+            })
 
     return JSONResponse(content={"results": results, "count": len(results), "request_id": request_id})
 

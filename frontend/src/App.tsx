@@ -39,6 +39,7 @@ export function App() {
   const [activeTarget, setActiveTarget] = useState<InvestigationTarget | undefined>(undefined);
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [sihOfflineMode, setSihOfflineMode] = useState(false);
 
   const { reduceAnimations, setReduceAnimations } = useSettingsStore();
 
@@ -154,8 +155,12 @@ export function App() {
 
           {/* Telemetry Status Badge */}
           <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-indigo-950 text-[11px] font-mono text-slate-300 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-            <span>63 Sectors · 352 Changes · LIVE TELEMETRY</span>
+            <span className={`w-2 h-2 rounded-full ${sihOfflineMode ? "bg-cyan-400" : "bg-emerald-400"} animate-pulse shadow-[0_0_8px_${sihOfflineMode ? "#22d3ee" : "#34d399"}]`} />
+            <span>
+              {sihOfflineMode
+                ? "SIH OFFLINE MODE (Air-Gapped: Local FAISS + Local ChangeFormer)"
+                : "63 Sectors · 352 Changes · LIVE TELEMETRY"}
+            </span>
           </div>
 
           {/* Settings button */}
@@ -177,7 +182,7 @@ export function App() {
             <span className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
               System Settings
             </span>
-            <span className="text-[10px] font-mono text-indigo-400">v2.4.0</span>
+            <span className="text-[10px] font-mono text-indigo-400">SIH 26227 v2.4</span>
           </div>
 
           <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">
@@ -190,18 +195,38 @@ export function App() {
             />
           </label>
 
+          {/* SIH Phase 14 Offline Mode Toggle */}
+          <label className="flex items-center justify-between text-xs text-slate-200 cursor-pointer p-2 rounded-lg bg-indigo-950/40 border border-indigo-500/30">
+            <div>
+              <span className="font-semibold text-cyan-300 block">SIH Offline Air-Gapped</span>
+              <span className="text-[10px] text-slate-400">Zero external API dependencies</span>
+            </div>
+            <input
+              type="checkbox"
+              checked={sihOfflineMode}
+              onChange={(e) => setSihOfflineMode(e.target.checked)}
+              className="accent-cyan-400 w-4 h-4"
+            />
+          </label>
+
           <div className="text-[11px] text-slate-400 flex flex-col gap-1 pt-1 border-t border-slate-800">
             <div className="flex justify-between">
               <span>Sentinel-2 API:</span>
-              <span className="text-emerald-400 font-mono">Connected</span>
+              <span className={sihOfflineMode ? "text-amber-400 font-mono" : "text-emerald-400 font-mono"}>
+                {sihOfflineMode ? "Local Archive" : "Connected"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>PostGIS Vector DB:</span>
-              <span className="text-emerald-400 font-mono">Ready</span>
+              <span className="text-emerald-400 font-mono">Ready (Local)</span>
             </div>
             <div className="flex justify-between">
               <span>ChangeFormer V6:</span>
               <span className="text-emerald-400 font-mono">Inference Active</span>
+            </div>
+            <div className="flex justify-between">
+              <span>LLM Engine:</span>
+              <span className="text-cyan-400 font-mono">{sihOfflineMode ? "Local Factual" : "Groq / Local"}</span>
             </div>
           </div>
         </div>

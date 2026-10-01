@@ -16,8 +16,8 @@ In accordance with SIH 26227 § 2.2.7:
 
 | Model Identifier | Primary Task | Source Repository / Author | Licence | Checkpoint File | Embedding Dim / Output | Checkpoint SHA-256 Hash |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **RemoteCLIP-ViT-L-14** | Multimodal Vision-Language Tile & Text Embeddings | `chendelong/RemoteCLIP` (Delong Chen et al., IEEE TGRS) | CC-BY-NC-SA 4.0 / Academic Open | `RemoteCLIP-ViT-L-14.pt` | 768-d unit-normalized float32 vector | `c5f87b28db40bb3c7d678a168233df86a7d57c7c10b0d3ce3d28fa2d51b3c829` |
-| **ChangeFormer V6** | Siamese Transformer-based Change Detection | `wgcban/ChangeFormerV6` (Bandara & Patel, IEEE CVPR/GRSL) | MIT Licence | `ChangeFormerV6.pth` | Binary change logit map ($256\times256$) | `7a12b84e3c98d6f9208a01cdb82436d4e5f76b4a2c9182d92138e65f3a097d12` |
+| **RemoteCLIP-ViT-L-14** | Multimodal Vision-Language Tile & Text Embeddings | `chendelong/RemoteCLIP` (Delong Chen et al., IEEE TGRS) | CC-BY-NC-SA 4.0 / Academic Open | `RemoteCLIP-ViT-L-14.pt` | 768-d unit-normalized float32 vector | `fcc2a7e21e171f4ffcb7a9c0206b8b74ac0c9eb83c67b576958b7a4ed6c8cecb` |
+| **ChangeFormer V6** | Siamese Transformer-based Change Detection | `wgcban/ChangeFormer` (Bandara & Patel, IEEE CVPR/GRSL) | MIT Licence | `ChangeFormerV6.pth` | Binary change logit map ($256\times256$) | `d979335bc19ea38232d820493fb85b9cb9e0fed8bc7734d3a2a299d4b454e415` |
 | **Deterministic Mock Adapter** | Unit Testing & Minimal-Resource Fallback | Internal / TerraPulse (`backend/app/services/`) | MIT Licence | Embedded in codebase | 768-d unit vector / deterministic mask | N/A (Source Verified) |
 
 ---

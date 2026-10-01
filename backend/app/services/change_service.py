@@ -87,8 +87,19 @@ class ChangeFormerAdapter(ChangeDetectorModel):
         try:
             import torch
             checkpoint = torch.load(str(self.checkpoint_path), map_location="cpu")
-            # Set model in eval mode
-            self._model = checkpoint
+            if isinstance(checkpoint, dict) and "state_dict" in checkpoint and checkpoint["state_dict"]:
+                try:
+                    from scripts.train_change_detection import SiameseChangeDetector
+                    net = SiameseChangeDetector(in_channels=3, num_classes=2, base_dim=32)
+                    net.load_state_dict(checkpoint["state_dict"], strict=False)
+                    net.eval()
+                    self._model = net
+                    log.info("ChangeFormer Siamese neural network loaded successfully")
+                except Exception as net_err:
+                    log.warning("Could not initialize SiameseChangeDetector, using raw checkpoint", error=str(net_err))
+                    self._model = checkpoint
+            else:
+                self._model = checkpoint
         except Exception as exc:
             raise ModelMissingError(
                 model_name="ChangeFormerV6",
@@ -102,6 +113,18 @@ class ChangeFormerAdapter(ChangeDetectorModel):
         threshold: float = 0.55,
     ) -> np.ndarray:
         self._ensure_loaded()
+        if hasattr(self._model, "forward") and callable(self._model):
+            try:
+                import torch
+                t1 = torch.from_numpy(t1_image.astype(np.float32) / 255.0).permute(2, 0, 1).unsqueeze(0)
+                t2 = torch.from_numpy(t2_image.astype(np.float32) / 255.0).permute(2, 0, 1).unsqueeze(0)
+                with torch.no_grad():
+                    logits = self._model(t1, t2)
+                    probs = torch.softmax(logits, dim=1)[0, 1].cpu().numpy()
+                return probs >= threshold
+            except Exception as e:
+                log.warning("Neural inference fallback to spectral difference", error=str(e))
+
         # Fallback to spectral difference if torch model is stubbed
         diff = np.abs(t2_image.astype(np.float32) - t1_image.astype(np.float32))
         prob_map = np.mean(diff, axis=-1) / 255.0
@@ -283,6 +306,10 @@ async def execute_change_analysis(
     model = detector
     if model is None:
         ckpt = Path(settings.changeformer_checkpoint_path)
+        if not ckpt.exists():
+            alt = ckpt.parent / "ChangeFormerV6.pth"
+            if alt.exists():
+                ckpt = alt
         if ckpt.exists():
             model = ChangeFormerAdapter(checkpoint_path=ckpt)
         else:

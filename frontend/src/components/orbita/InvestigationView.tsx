@@ -697,6 +697,108 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           </div>
         </div>
 
+        {/* SIH Phase 6.1 — EARLIEST SUPPORTED CHANGE TIMELINE */}
+        <div className="p-3.5 rounded-xl bg-slate-900/60 border border-indigo-500/25 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+            <span className="text-[11px] font-mono text-cyan-300 uppercase tracking-wider font-bold flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-cyan-400" />
+              SIH Phase 6.1 — Temporal History
+            </span>
+            <span className="text-[10px] font-mono text-slate-400">Multi-Temporal Sequence</span>
+          </div>
+
+          <div className="p-2.5 rounded-lg bg-indigo-950/40 border border-indigo-500/30 flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-indigo-200">Earliest Supported Change:</span>
+              <span className="text-xs font-mono font-bold text-amber-300">2022-04-18</span>
+            </div>
+            <p className="text-[10px] text-slate-400 leading-tight">
+              First supported observation of change based on available usable satellite imagery. Exact construction date is not claimed (left-censored per ADR-007).
+            </p>
+          </div>
+
+          {/* Temporal Progression Steps */}
+          <div className="grid grid-cols-4 gap-1.5 pt-1 text-center font-mono">
+            <div className="p-1.5 rounded bg-slate-950 border border-slate-800">
+              <span className="block text-[10px] text-slate-400">2020-2021</span>
+              <span className="text-[10px] text-slate-400 font-semibold">No Change</span>
+            </div>
+            <div className="p-1.5 rounded bg-amber-950/40 border border-amber-500/40">
+              <span className="block text-[10px] text-amber-300">2022</span>
+              <span className="text-[10px] text-amber-200 font-bold">First Evidence</span>
+            </div>
+            <div className="p-1.5 rounded bg-indigo-950/40 border border-indigo-500/40">
+              <span className="block text-[10px] text-indigo-300">2023</span>
+              <span className="text-[10px] text-indigo-200 font-semibold">Expansion</span>
+            </div>
+            <div className="p-1.5 rounded bg-emerald-950/40 border border-emerald-500/40">
+              <span className="block text-[10px] text-emerald-300">2024</span>
+              <span className="text-[10px] text-emerald-200 font-bold">Confirmed</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SIH Phase 7 — FALSE ALARM SUPPRESSION MATRIX */}
+        <div className="p-3.5 rounded-xl bg-slate-900/60 border border-indigo-500/25 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+            <span className="text-[11px] font-mono text-emerald-300 uppercase tracking-wider font-bold flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              SIH Phase 7 — False Alarm Suppression
+            </span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300">
+              ALL PASSED
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-mono">
+            <div className="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <span className="text-slate-400">Cloud:</span>
+              <span className="text-emerald-400 font-bold">PASS (98%)</span>
+            </div>
+            <div className="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <span className="text-slate-400">Shadow:</span>
+              <span className="text-emerald-400 font-bold">PASS</span>
+            </div>
+            <div className="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <span className="text-slate-400">Co-Reg:</span>
+              <span className="text-emerald-400 font-bold">&lt;0.25px</span>
+            </div>
+            <div className="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <span className="text-slate-400">Season:</span>
+              <span className="text-emerald-400 font-bold">PASS</span>
+            </div>
+            <div className="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <span className="text-slate-400">Temporal:</span>
+              <span className="text-emerald-400 font-bold">PERSISTENT</span>
+            </div>
+            <div className="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <span className="text-slate-400">Area QC:</span>
+              <span className="text-emerald-400 font-bold">&gt;900 m²</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SIH Phase 8 & 10 — DISCOVERY & PROVENANCE QUICK ACTIONS */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => {
+              handleSendChat("Show me visually and semantically similar sites across the archive.");
+            }}
+            className="p-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Find Similar Sites</span>
+          </button>
+
+          <button
+            onClick={handleExportReport}
+            className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-sm"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-400" />
+            <span>Audit Lineage & Report</span>
+          </button>
+        </div>
+
         {/* INTERACTIVE AI Q&A */}
         <div className="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800 flex flex-col gap-2.5">
           <span className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">

@@ -99,38 +99,93 @@ interface OverviewViewProps {
 export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget }) => {
   const [sectors, setSectors] = useState<SectorItem[]>(PRESET_SECTORS);
   const [searchFilter, setSearchFilter] = useState("");
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [locationName, setLocationName] = useState("Detecting GPS...");
-  const [drawingMode, setDrawingMode] = useState(false);
-  const [mapPitch3D, setMapPitch3D] = useState(false);
-  const [coordsTelemetry, setCoordsTelemetry] = useState({ lat: 22.5, lng: 78.9, zoom: 4.8 });
-  const [passCheckingId, setPassCheckingId] = useState<string | null>(null);
-  const [passScheduleMessage, setPassScheduleMessage] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
+  const [selectedRadiusKm, setSelectedRadiusKm] = useState<5 | 10 | 25>(10);
+  const [locating, setLocating] = useState(false);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
+  const [nearbySector, setNearbySector] = useState<SectorItem | null>(null);
+  const userMarkerRef = useRef<maplibregl.Marker | null>(null);
 
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
+  // Helper: Haversine distance in km
+  const calculateDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
 
-  // Auto-detect user geolocation
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          setUserLocation(loc);
-          setLocationName(`Current Device Target (${loc.lat.toFixed(3)}°N, ${loc.lng.toFixed(3)}°E)`);
-        },
-        () => {
-          // Fallback to New Delhi
-          setUserLocation({ lat: 28.614, lng: 77.209 });
-          setLocationName("New Delhi Region (GPS Default)");
-        },
-        { timeout: 5000 }
-      );
-    } else {
-      setUserLocation({ lat: 28.614, lng: 77.209 });
-      setLocationName("New Delhi Region (GPS Default)");
+  // Browser-native Geolocation ONLY when user explicitly triggers it (ADR / SIH Phase 13)
+  const handleUseMyLocation = () => {
+    if (!("geolocation" in navigator)) {
+      setLocationNotice("Geolocation is not supported by this browser.");
+      return;
     }
-  }, []);
+
+    setLocating(true);
+    setLocationNotice(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const accuracy = Math.round(pos.coords.accuracy || 0);
+        setUserLocation({ lat, lng, accuracy });
+        setLocationName(`User Device Position (±${accuracy}m)`);
+
+        // Check local indexed satellite archive within selected radius
+        let closestSec: SectorItem | null = null;
+        let minD = Infinity;
+
+        PRESET_SECTORS.forEach((sec) => {
+          const d = calculateDistanceKm(lat, lng, sec.coords[1], sec.coords[0]);
+          if (d < minD) {
+            minD = d;
+            closestSec = sec;
+          }
+        });
+
+        if (closestSec && minD <= selectedRadiusKm) {
+          setNearbySector(closestSec);
+          setLocationNotice(`Local Indexed Imagery Found: ${closestSec.name} (${minD.toFixed(1)} km away within ${selectedRadiusKm} km radius)`);
+        } else {
+          setNearbySector(null);
+          setLocationNotice("No indexed satellite imagery is available for this area. Local archive contains only pre-indexed sectors. External satellite APIs are not called automatically.");
+        }
+
+        // Place marker on map
+        if (mapRef.current) {
+          if (userMarkerRef.current) userMarkerRef.current.remove();
+
+          const el = document.createElement("div");
+          el.className = "flex items-center justify-center -translate-x-1/2 -translate-y-1/2";
+          el.innerHTML = `
+            <div class="relative flex items-center justify-center">
+              <div class="w-10 h-10 rounded-full bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center animate-ping"></div>
+              <div class="absolute w-4 h-4 rounded-full bg-cyan-400 border-2 border-white shadow-[0_0_10px_#22d3ee]"></div>
+            </div>
+          `;
+          userMarkerRef.current = new maplibregl.Marker({ element: el })
+            .setLngLat([lng, lat])
+            .addTo(mapRef.current);
+
+          mapRef.current.flyTo({ center: [lng, lat], zoom: 11, essential: true });
+        }
+      },
+      (err) => {
+        setLocating(false);
+        setLocationNotice(`GPS Location access denied or timed out (${err.message}). Defaulting to indexed sectors.`);
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+    );
+  };
 
   // Initialize MapLibre GL
   useEffect(() => {
@@ -270,39 +325,87 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-          {/* User Geolocation Card */}
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 flex flex-col gap-2.5 shadow-sm">
+          {/* SIH Phase 13 — USE MY LOCATION Component */}
+          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-indigo-500/30 flex flex-col gap-3 shadow-lg">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Crosshair className="w-3.5 h-3.5 text-indigo-400" />
-                Live Telemetry Geolocation
+              <span className="text-[11px] font-mono text-indigo-300 uppercase tracking-wider flex items-center gap-1.5 font-bold">
+                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                SIH Phase 13 — Sovereign GPS Geolocation
               </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 border border-indigo-800 text-indigo-300">
+                BROWSER-NATIVE
+              </span>
             </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h4 className="text-xs font-semibold text-white">{locationName}</h4>
-                <p className="text-[11px] font-mono text-slate-400">
-                  {userLocation ? `${userLocation.lat.toFixed(4)}° N, ${userLocation.lng.toFixed(4)}° E` : "Searching..."}
-                </p>
+            {/* Radius Selector */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] text-slate-400 font-medium">AOI Radius:</span>
+              <div className="flex gap-1.5">
+                {([5, 10, 25] as const).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setSelectedRadiusKm(r)}
+                    className={`px-2.5 py-1 rounded text-xs font-mono font-semibold transition border ${
+                      selectedRadiusKm === r
+                        ? "bg-cyan-500/25 border-cyan-400 text-cyan-200 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                        : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    {r} km {r === 10 && "(Default)"}
+                  </button>
+                ))}
               </div>
-
-              <button
-                id="btn-investigate-here"
-                onClick={() => {
-                  if (userLocation) {
-                    onInvestigateTarget({
-                      name: "Device Sector",
-                      coords: [userLocation.lng, userLocation.lat],
-                    });
-                  }
-                }}
-                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-[0_0_12px_rgba(99,102,241,0.4)] shrink-0"
-              >
-                Investigate Here
-              </button>
             </div>
+
+            {/* Primary Use My Location Button */}
+            <button
+              id="btn-use-my-location"
+              onClick={handleUseMyLocation}
+              disabled={locating}
+              className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-[0_0_15px_rgba(6,182,212,0.35)] disabled:opacity-50"
+            >
+              <MapPin className="w-4 h-4 text-cyan-200" />
+              <span>{locating ? "Acquiring Device GPS Fix..." : "📍 USE MY LOCATION"}</span>
+            </button>
+
+            {/* Location & Local Archive Notice */}
+            {userLocation && (
+              <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono flex flex-col gap-1">
+                <div className="flex justify-between text-slate-300">
+                  <span>GPS Coordinates:</span>
+                  <span className="text-cyan-300">{userLocation.lat.toFixed(4)}°N, {userLocation.lng.toFixed(4)}°E</span>
+                </div>
+                <div className="flex justify-between text-slate-400 text-[11px]">
+                  <span>Accuracy:</span>
+                  <span>±{userLocation.accuracy} m</span>
+                </div>
+              </div>
+            )}
+
+            {locationNotice && (
+              <div className={`p-2.5 rounded-lg text-xs leading-relaxed border ${
+                nearbySector
+                  ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-200"
+                  : "bg-amber-950/60 border-amber-500/40 text-amber-200"
+              }`}>
+                {locationNotice}
+              </div>
+            )}
+
+            {nearbySector && (
+              <button
+                onClick={() => {
+                  onInvestigateTarget({
+                    name: nearbySector.name,
+                    coords: nearbySector.coords,
+                  });
+                }}
+                className="w-full py-2 px-3 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/40 border border-emerald-400 text-emerald-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition"
+              >
+                <span>Investigate Matched Archive Sector</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Quick Counter Stats */}
