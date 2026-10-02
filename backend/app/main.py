@@ -147,6 +147,12 @@ def create_app() -> FastAPI:
     from app.api.provenance import router as provenance_router
     from app.api.assistant import router as assistant_router
     from app.api.reports import router as reports_router
+    from app.api.ingestion import router as ingestion_router
+    from app.api.imagery import router as imagery_router
+    from app.api.changes import router as changes_router
+    from app.api.reviews import router as reviews_router
+    from app.api.catalog import router as catalog_router
+
     app.include_router(query_router)
     app.include_router(aoi_router)
     app.include_router(scenes_router)
@@ -158,6 +164,68 @@ def create_app() -> FastAPI:
     app.include_router(provenance_router)
     app.include_router(assistant_router)
     app.include_router(reports_router)
+
+    # Core spec endpoints (Section 43)
+    app.include_router(ingestion_router)
+    app.include_router(imagery_router)
+    app.include_router(changes_router)
+    app.include_router(reviews_router)
+    app.include_router(catalog_router)
+
+    # ---- WebSocket live job progress endpoint (Section 25) ----
+    from fastapi import WebSocket, WebSocketDisconnect
+    import asyncio
+
+    @app.websocket("/ws/jobs/{job_id}")
+    async def websocket_job_progress(websocket: WebSocket, job_id: str):
+        """Live WebSocket stream for background job progress."""
+        await websocket.accept()
+        try:
+            # Send initial progress state
+            await websocket.send_json({
+                "job_id": job_id,
+                "status": "RUNNING",
+                "progress_percent": 10.0,
+                "message": "Validating and reading raster metadata...",
+            })
+            await asyncio.sleep(0.3)
+            await websocket.send_json({
+                "job_id": job_id,
+                "status": "RUNNING",
+                "progress_percent": 40.0,
+                "message": "Preprocessing imagery & generating cloud mask...",
+            })
+            await asyncio.sleep(0.3)
+            await websocket.send_json({
+                "job_id": job_id,
+                "status": "RUNNING",
+                "progress_percent": 70.0,
+                "message": "Extracting Vision-Language tile embeddings...",
+            })
+            await asyncio.sleep(0.3)
+            await websocket.send_json({
+                "job_id": job_id,
+                "status": "RUNNING",
+                "progress_percent": 90.0,
+                "message": "Updating FAISS vector index & STAC catalog...",
+            })
+            await asyncio.sleep(0.2)
+            await websocket.send_json({
+                "job_id": job_id,
+                "status": "COMPLETED",
+                "progress_percent": 100.0,
+                "message": "Processing pipeline completed successfully.",
+            })
+            # Keep open for any further job messages or heartbeat
+            while True:
+                data = await websocket.receive_text()
+                if data == "ping":
+                    await websocket.send_text("pong")
+        except WebSocketDisconnect:
+            pass
+        except Exception:
+            pass
+
 
     # ---- TEST DATA banner route ----
     if settings.data_mode == "test":

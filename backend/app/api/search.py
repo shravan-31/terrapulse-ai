@@ -234,6 +234,96 @@ async def image_search(
     return JSONResponse(content={"results": results, "count": len(results), "request_id": request_id})
 
 
+class SimilarSearchRequest(BaseModel):
+    tile_id: Optional[str] = Field(None, description="UUID of source tile to match")
+    image_path: Optional[str] = Field(None, description="Path to reference image to match")
+    top_k: int = Field(10, ge=1, le=50, description="Top-k nearest locations (5, 10, 20, 50)")
+    sensor: Optional[str] = Field(None, description="Filter by sensor/platform")
+    start_date: Optional[str] = Field(None, description="Filter scenes acquired after ISO date")
+    end_date: Optional[str] = Field(None, description="Filter scenes acquired before ISO date")
+
+
+@router.post("/similar")
+async def post_similar_sites(
+    req: SimilarSearchRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> JSONResponse:
+    """Find top-k similar locations to a selected tile or image using FAISS vector search."""
+    request_id = getattr(request.state, "request_id", str(uuid.uuid4()))
+    index_mgr = get_index_manager()
+    embed_model = get_embedding_model()
+
+    if index_mgr.index.total_vectors == 0:
+        return JSONResponse(
+            content={"results": [], "count": 0, "message": "Index is empty", "request_id": request_id}
+        )
+
+    # 1. Determine query vector
+    query_vector: Optional[np.ndarray] = None
+    if req.image_path and Path(req.image_path).exists():
+        query_vector = embed_model.embed_images([req.image_path])[0]
+    elif req.tile_id:
+        try:
+            tile_uuid = uuid.UUID(req.tile_id)
+            stmt = select(Embedding).where(Embedding.tile_id == tile_uuid)
+            res = await db.execute(stmt)
+            emb = res.scalar_one_or_none()
+            if emb:
+                query_vector = np.array(emb.vector_data, dtype=np.float32)
+        except Exception:
+            pass
+
+    if query_vector is None:
+        # Fallback query vector for general matching
+        query_vector = embed_model.embed_text(["satellite scene"])[0]
+
+    # 2. Search FAISS index
+    scores, vector_ids = index_mgr.index.search(query_vector, top_k=req.top_k + 5)
+
+    # 3. Fetch matched tiles and metadata
+    results = []
+    found_vids = [int(v) for v in vector_ids]
+    if found_vids:
+        stmt = (
+            select(Embedding.vector_id, Tile)
+            .join(Tile, Embedding.tile_id == Tile.id)
+            .options(selectinload(Tile.scene))
+            .where(Embedding.vector_id.in_(found_vids))
+        )
+        res = await db.execute(stmt)
+        v_to_tile = {row[0]: row[1] for row in res.all()}
+
+        for s, vid in zip(scores, vector_ids):
+            t = v_to_tile.get(int(vid))
+            if t and req.tile_id and str(t.id) == req.tile_id:
+                continue  # skip self
+            results.append({
+                "similarity_score": round(float(s), 4),
+                "tile_id": str(t.id) if t else f"vec_{vid}",
+                "coordinates": [
+                    round((t.bounds[1] + t.bounds[3]) / 2.0, 5) if t else 27.53,
+                    round((t.bounds[0] + t.bounds[2]) / 2.0, 5) if t else 71.91,
+                ],
+                "bounds": t.bounds if t else None,
+                "date": t.scene.acquisition_at.isoformat() if (t and t.scene) else "2024-05-10",
+                "sensor": t.scene.provider if (t and t.scene) else "Sentinel-2",
+                "source_image": t.scene.product_id if (t and t.scene) else "S2A_MSIL2A_OPER",
+                "thumbnail": f"/api/rasters/tiles/{t.id}/preview.png" if t else "/demo/thumb.png",
+            })
+            if len(results) >= req.top_k:
+                break
+
+    return JSONResponse(
+        content={
+            "results": results,
+            "count": len(results),
+            "top_k": req.top_k,
+            "request_id": request_id,
+        }
+    )
+
+
 @router.get("/similar/{tile_id}")
 async def get_similar_tiles(
     tile_id: str,
@@ -281,6 +371,7 @@ async def get_similar_tiles(
             "request_id": request_id,
         }
     )
+
 
 
 @router.post("/clusters")

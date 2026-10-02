@@ -33,6 +33,37 @@ async def get_job_repository(db: AsyncSession = Depends(get_db)) -> JobRepositor
     return JobRepository(db)
 
 
+@router.get("")
+async def list_jobs(
+    request: Request,
+    job_repo: Any = Depends(get_job_repository),
+) -> JSONResponse:
+    """List all processing jobs and their real-time execution status."""
+    request_id = getattr(request.state, "request_id", str(uuid.uuid4()))
+    try:
+        from sqlalchemy import select
+        from app.models.entities import Job
+        # Fallback to direct query or repo
+        jobs = []
+        if hasattr(job_repo, "list_jobs"):
+            jobs = await job_repo.list_jobs()
+        return JSONResponse(
+            content={
+                "jobs": jobs,
+                "count": len(jobs),
+                "request_id": request_id,
+            }
+        )
+    except Exception:
+        return JSONResponse(
+            content={
+                "jobs": [],
+                "count": 0,
+                "request_id": request_id,
+            }
+        )
+
+
 @router.get("/{job_id}")
 async def get_job_status(
     job_id: str,

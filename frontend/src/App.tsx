@@ -22,15 +22,18 @@ import {
   Sliders,
   Radio,
   Layers,
+  UploadCloud,
 } from "lucide-react";
 
 import { MissionView } from "./components/terrapulse/MissionView";
 import { OverviewView } from "./components/terrapulse/OverviewView";
 import { InvestigationView, InvestigationTarget } from "./components/terrapulse/InvestigationView";
 import { SemanticSearchView } from "./components/terrapulse/SemanticSearchView";
+import { IngestModal } from "./components/IngestModal";
 import { fetchHealth } from "./services/api";
 import { SystemHealth } from "./types";
 import { useSettingsStore } from "./stores/settingsStore";
+
 
 export function App() {
   const [activeView, setActiveView] = useState<"mission" | "console" | "investigate" | "search">(
@@ -39,6 +42,7 @@ export function App() {
   const [activeTarget, setActiveTarget] = useState<InvestigationTarget | undefined>(undefined);
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showIngestModal, setShowIngestModal] = useState(false);
   const [sihOfflineMode, setSihOfflineMode] = useState(false);
 
   const { reduceAnimations, setReduceAnimations } = useSettingsStore();
@@ -142,7 +146,18 @@ export function App() {
         </nav>
 
         {/* Right Actions & Telemetry */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          {/* Ingest GeoTIFF Action */}
+          <button
+            id="btn-ingest-raster"
+            onClick={() => setShowIngestModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+            title="Upload and ingest real satellite GeoTIFF or COG files"
+          >
+            <UploadCloud className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Ingest GeoTIFF</span>
+          </button>
+
           {/* New Scan Action */}
           <button
             id="btn-new-scan"
@@ -152,6 +167,7 @@ export function App() {
             <Plus className="w-3.5 h-3.5" />
             <span>New Scan</span>
           </button>
+
 
           {/* AI Model Badge */}
           <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-[11px] font-mono text-indigo-200 shadow-[0_0_10px_rgba(99,102,241,0.25)]">
@@ -251,7 +267,17 @@ export function App() {
           <SemanticSearchView onInvestigateTarget={handleInvestigateTarget} />
         )}
       </main>
+
+      {/* Offline GeoTIFF Ingestion Modal */}
+      <IngestModal
+        isOpen={showIngestModal}
+        onClose={() => setShowIngestModal(false)}
+        onSuccess={() => {
+          setActiveView("investigate");
+        }}
+      />
     </div>
+
   );
 }
 

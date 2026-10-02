@@ -1,0 +1,56 @@
+# TerraPulse AI / SatQuery AI — Offline Satellite Intelligence Configuration
+app:
+  name: "TerraPulse AI — Autonomous Satellite Intelligence"
+  version: "1.0.0"
+  offline_mode: true
+  environment: "development"
+
+processing:
+  tile_size: 512
+  overlap: 64
+  resampling_method: "bilinear"
+  categorical_resampling: "nearest"
+  cloud_mask_source: "scl"  # scl or spectral_threshold
+  cloud_threshold_percent: 20.0
+  max_acceptable_shift_px: 2.5
+
+search:
+  top_k_default: 10
+  vector_dimension: 768
+  similarity_metric: "cosine"  # inner product on L2-normalized vectors
+
+change_detection:
+  default_method: "classical"  # classical or deep
+  change_threshold: 0.55
+  min_change_pixels: 9
+  min_change_area_m2: 900.0  # 3x3 10m pixels
+  classification_rules:
+    construction_ndvi_drop: -0.20
+    construction_ndbi_gain: 0.10
+    vegetation_loss_ndvi_drop: -0.20
+    vegetation_gain_ndvi_rise: 0.20
+    water_change_ndwi_shift: 0.25
+
+models:
+  embedding:
+    provider: "remoteclip"  # remoteclip, openclip, or clip
+    model_name: "RemoteCLIP-ViT-L-14"
+    model_path: "./models/remoteclip/RemoteCLIP-ViT-L-14.pt"
+    device: "cpu"
+    batch_size: 8
+  change_detection:
+    provider: "siamese_v6"  # siamese_v6, changeformer, or classical
+    model_path: "./models/changeformer/ChangeFormerV6.pth"
+    device: "cpu"
+
+storage:
+  data_dir: "./data"
+  raw_dir: "./data/raw"
+  processed_dir: "./data/processed"
+  tiles_dir: "./data/tiles"
+  thumbnails_dir: "./data/thumbnails"
+  masks_dir: "./data/masks"
+  embeddings_dir: "./data/embeddings"
+  indexes_dir: "./data/indexes"
+  catalog_dir: "./data/catalog"
+  reports_dir: "./data/reports"

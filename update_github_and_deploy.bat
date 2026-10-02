@@ -13,8 +13,8 @@ git add .
 git status --short
 echo.
 
-echo [STEP 2/3] Committing updates with SIH 26227 verified trained model...
-git commit -m "feat(siamese-cd): integrate trained ChangeFormerV6 model, live model metrics card, and SIH 26227 semantic queries"
+echo [STEP 2/3] Committing updates with full offline satellite intelligence platform...
+git commit -m "feat(offline-platform): complete offline satellite intelligence platform with model abstraction, classical/deep change detection, geospatial raster engine, local STAC catalog, ReportLab PDF reports, and Ingest UI"
 if %ERRORLEVEL% NEQ 0 (
     echo [INFO] No new changes to commit or commit succeeded.
 )

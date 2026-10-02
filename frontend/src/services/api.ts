@@ -511,4 +511,155 @@ export async function fetchClusters(
   return resp.json();
 }
 
+// ---------------------------------------------------------------------------
+// Offline Satellite Intelligence Client Functions (Section 43)
+// ---------------------------------------------------------------------------
+
+
+export interface IngestUploadResponse {
+  status: string;
+  file_path: string;
+  filename: string;
+  sensor: string;
+  size_mb: number;
+}
+
+export async function uploadRasterFile(
+  file: File,
+  sensor: string = "Sentinel-2",
+  acquisitionDate?: string
+): Promise<IngestUploadResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("sensor", sensor);
+  if (acquisitionDate) formData.append("acquisition_date", acquisitionDate);
+
+  const resp = await fetch("/api/ingestion/upload", {
+    method: "POST",
+    body: formData,
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `Upload failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+export async function triggerIngestionProcess(
+  filePath: string,
+  sensor: string = "Sentinel-2",
+  acquisitionDate?: string
+): Promise<any> {
+  const resp = await fetch("/api/ingestion/process", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      file_path: filePath,
+      sensor,
+      acquisition_date: acquisitionDate,
+    }),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `Ingestion process failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+export async function fetchImageryList(sensor?: string): Promise<any> {
+  const url = sensor ? `/api/imagery?platform=${encodeURIComponent(sensor)}` : "/api/imagery";
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Failed to list imagery: HTTP ${resp.status}`);
+  return resp.json();
+}
+
+export async function executeChangeDetectionApi(payload: {
+  before_image_path: string;
+  after_image_path: string;
+  method?: "classical" | "deep";
+  threshold?: number;
+  min_change_area?: number;
+}): Promise<any> {
+  const resp = await fetch("/api/change-detection", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `Change detection failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+export async function submitReviewApi(payload: {
+  detection_id: string;
+  status: "CONFIRM" | "REJECT" | "NEEDS_REVIEW";
+  notes?: string;
+  corrected_type?: string;
+  confidence_override?: number;
+}): Promise<any> {
+  const resp = await fetch("/api/reviews", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `Review submission failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+export async function fetchCatalogCollection(): Promise<any> {
+  const resp = await fetch("/api/catalog");
+  if (!resp.ok) throw new Error(`Catalog fetch failed: HTTP ${resp.status}`);
+  return resp.json();
+}
+
+export async function generatePdfReportApi(payload: {
+  title?: string;
+  location_name: string;
+  coordinates: number[];
+  before_date: string;
+  after_date: string;
+  sensor: string;
+  total_change_area_m2: number;
+  percentage_change: number;
+  confidence_score: number;
+  change_type: string;
+  review_status: string;
+  reviewer_notes?: string;
+  methodology?: string;
+}): Promise<any> {
+  const resp = await fetch("/api/reports", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `PDF Report generation failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+export async function fetchSimilarSitesApi(payload: {
+  tile_id?: string;
+  image_path?: string;
+  top_k?: number;
+}): Promise<any> {
+  const resp = await fetch("/api/search/similar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `Similar site search failed: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+
+
 

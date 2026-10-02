@@ -5,7 +5,7 @@ REM =========================================================================
 cd /d "%~dp0"
 
 echo =========================================================================
-echo   TerraPulse AI - Pushing Console Upgrades, Spectral Bands & API Fixes
+echo   TerraPulse AI - Pushing Offline Satellite Intelligence Platform
 echo =========================================================================
 echo.
 
@@ -15,8 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "feat(investigation-console): enhance satellite pass comparison, spectral NIR filters, inspector heatmap, resilient proxy, and analyst verification"
-
+git commit -m "feat(offline-platform): complete offline satellite intelligence platform with model abstraction, classical/deep change detection, geospatial raster engine, local STAC catalog, ReportLab PDF reports, and Ingest UI"
 
 echo.
 echo [3/3] Pushing to GitHub...
