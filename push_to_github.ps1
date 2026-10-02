@@ -12,7 +12,7 @@ git add .
 git status --short
 
 Write-Host "`n[2/3] Creating commit..." -ForegroundColor Yellow
-git commit -m "feat(mobile): add responsive mobile navigation bar, adaptive multi-column layouts, and LAN host binding"
+git commit -m "fix(ui): fix spectral bands, view layout switching, and mouse-drag for laptops and desktops"
 
 Write-Host "`n[3/3] Pushing to origin main..." -ForegroundColor Yellow
 git push origin main

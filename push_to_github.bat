@@ -15,7 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "feat(mobile): add responsive mobile navigation bar, adaptive multi-column layouts, and LAN host binding"
+git commit -m "fix(ui): fix spectral bands, view layout switching, and mouse-drag for laptops and desktops"
 
 echo.
 echo [3/3] Pushing to GitHub...

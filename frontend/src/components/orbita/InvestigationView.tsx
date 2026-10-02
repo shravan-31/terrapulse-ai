@@ -478,6 +478,30 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     handleSwipeMove(clientX, rect);
   };
 
+  // Full mouse-drag tracking for laptop/desktop
+  const handleContainerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (viewMode !== "swipe" || !comparisonContainerRef.current) return;
+    isDraggingSwipe.current = true;
+    const rect = comparisonContainerRef.current.getBoundingClientRect();
+    handleSwipeMove(e.clientX, rect);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      if (isDraggingSwipe.current && comparisonContainerRef.current) {
+        const curRect = comparisonContainerRef.current.getBoundingClientRect();
+        handleSwipeMove(moveEvent.clientX, curRect);
+      }
+    };
+
+    const onMouseUp = () => {
+      isDraggingSwipe.current = false;
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+
   const getSpectralFilter = () => {
     if (spectralBand === "nir") {
       return "hue-rotate(285deg) saturate(350%) contrast(140%) brightness(105%)";
@@ -488,10 +512,39 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     return "none";
   };
 
+  // Sync spectral band filter to MapLibre WebGL canvas on laptop & mobile
+  useEffect(() => {
+    if (mapContainerRef.current) {
+      const canvas = mapContainerRef.current.querySelector("canvas");
+      if (canvas) {
+        canvas.style.filter = getSpectralFilter();
+      }
+    }
+  }, [spectralBand]);
+
+  // Sync heatmap and inspector view mode to MapLibre layers
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (map.getLayer("aoi-box-fill")) {
+      if (viewMode === "inspector" || heatmapEnabled) {
+        map.setPaintProperty("aoi-box-fill", "fill-color", "#f43f5e");
+        map.setPaintProperty("aoi-box-fill", "fill-opacity", 0.45);
+        map.setPaintProperty("aoi-box-outline", "line-color", "#fb7185");
+        map.setPaintProperty("aoi-box-outline", "line-width", 3.5);
+      } else {
+        map.setPaintProperty("aoi-box-fill", "fill-color", "#818cf8");
+        map.setPaintProperty("aoi-box-fill", "fill-opacity", 0.2);
+        map.setPaintProperty("aoi-box-outline", "line-color", "#6366f1");
+        map.setPaintProperty("aoi-box-outline", "line-width", 2.5);
+      }
+    }
+  }, [viewMode, heatmapEnabled]);
+
   return (
     <div className="flex-1 flex flex-col xl:flex-row h-full overflow-y-auto xl:overflow-hidden bg-[#060913] text-slate-100 select-text pb-16 md:pb-0">
       {/* ================= LEFT COLUMN: TARGET & TIME CONFIG ================= */}
-      <div className="w-full xl:w-[380px] border-b xl:border-b-0 xl:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto p-4 gap-4 z-10">
+      <div className="w-full xl:w-[380px] border-b xl:border-b-0 xl:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto xl:h-full xl:max-h-full p-4 gap-4 z-10">
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-indigo-400" />
@@ -677,48 +730,115 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
 
       {/* ================= CENTER COLUMN: MAP VIEWPORT ================= */}
-      <div className="flex-1 relative flex flex-col min-h-[360px] h-[45vh] xl:h-auto xl:min-h-0 border-b xl:border-b-0 xl:border-r border-slate-800 shrink-0">
+      <div className="flex-1 relative flex flex-col min-h-[360px] h-[45vh] xl:h-full border-b xl:border-b-0 xl:border-r border-slate-800 shrink-0">
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
-        {/* Map Floating Controls */}
-        <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-          <button
-            onClick={() => {
-              const next = !map3D;
-              setMap3D(next);
-              mapRef.current?.easeTo({ pitch: next ? 50 : 0, duration: 600 });
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono backdrop-blur-md transition border shadow-lg ${
-              map3D
-                ? "bg-indigo-600 text-white border-indigo-400 font-bold"
-                : "bg-slate-950/80 text-indigo-300 border-indigo-500/30"
-            }`}
-          >
-            {map3D ? "3D TILT" : "2D FLAT"}
-          </button>
+        {/* Map Floating Controls with Synchronized Spectral Band and View Layout */}
+        <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+          <div className="flex items-center gap-2 pointer-events-auto">
+            <button
+              id="map-btn-3d"
+              onClick={() => {
+                const next = !map3D;
+                setMap3D(next);
+                mapRef.current?.easeTo({ pitch: next ? 50 : 0, duration: 600 });
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono backdrop-blur-md transition border shadow-lg ${
+                map3D
+                  ? "bg-indigo-600 text-white border-indigo-400 font-bold"
+                  : "bg-slate-950/80 text-indigo-300 border-indigo-500/30"
+              }`}
+            >
+              {map3D ? "3D TILT" : "2D FLAT"}
+            </button>
 
-          <button
-            onClick={() => setHeatmapEnabled(!heatmapEnabled)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono backdrop-blur-md transition border shadow-lg flex items-center gap-1.5 ${
-              heatmapEnabled
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                : "bg-slate-950/80 text-slate-400 border-slate-700"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>HEATMAP {heatmapEnabled ? "ON" : "OFF"}</span>
-          </button>
+            <button
+              id="map-btn-heatmap"
+              onClick={() => setHeatmapEnabled(!heatmapEnabled)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono backdrop-blur-md transition border shadow-lg flex items-center gap-1.5 ${
+                heatmapEnabled
+                  ? "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                  : "bg-slate-950/80 text-slate-400 border-slate-700"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>HEATMAP {heatmapEnabled ? "ON" : "OFF"}</span>
+            </button>
+          </div>
+
+          {/* Quick Floating Band & Layout Bar on Map for Laptop/Desktop */}
+          <div className="hidden sm:flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/90 border border-indigo-500/40 backdrop-blur-md shadow-2xl pointer-events-auto">
+            <div className="flex items-center gap-1 pr-1.5 border-r border-slate-800">
+              <button
+                id="map-btn-true-color"
+                onClick={() => setSpectralBand("true_color")}
+                className={`px-2 py-1 rounded text-[10px] font-mono transition ${
+                  spectralBand === "true_color"
+                    ? "bg-indigo-600 text-white font-bold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+                title="True Color (RGB)"
+              >
+                True Color
+              </button>
+              <button
+                id="map-btn-nir"
+                onClick={() => setSpectralBand("nir")}
+                className={`px-2 py-1 rounded text-[10px] font-mono transition ${
+                  spectralBand === "nir"
+                    ? "bg-rose-600 text-white font-bold shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                    : "text-slate-400 hover:text-rose-300"
+                }`}
+                title="False Color NIR (Infrared vegetation anomaly)"
+              >
+                False Color NIR
+              </button>
+              <button
+                id="map-btn-night"
+                onClick={() => setSpectralBand("night")}
+                className={`px-2 py-1 rounded text-[10px] font-mono transition ${
+                  spectralBand === "night"
+                    ? "bg-purple-600 text-white font-bold"
+                    : "text-slate-400 hover:text-purple-300"
+                }`}
+                title="Night Thermal Sensor"
+              >
+                Night
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1 pl-1">
+              {(["swipe", "dual", "inspector"] as const).map((v) => (
+                <button
+                  key={v}
+                  id={`map-btn-layout-${v}`}
+                  onClick={() => setViewMode(v)}
+                  className={`px-2 py-1 rounded text-[10px] font-mono uppercase transition ${
+                    viewMode === v
+                      ? "bg-indigo-600 text-white font-bold shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Center Target Indicator Badge */}
         <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 rounded-lg bg-slate-950/90 border border-indigo-500/30 backdrop-blur-md text-[11px] font-mono text-indigo-300 flex items-center gap-2 shadow-xl">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]" />
           <span>INSPECTING: {selectedTarget.toUpperCase()}</span>
+          <span className="text-slate-600">|</span>
+          <span className="text-indigo-400 uppercase font-bold">{spectralBand.replace('_', ' ')}</span>
+          <span className="text-slate-600">|</span>
+          <span className="text-emerald-400 uppercase font-bold">{viewMode}</span>
         </div>
       </div>
 
       {/* ================= RIGHT COLUMN: IMAGERY COMPARISON & AI REPORT ================= */}
-      <div className="w-full xl:w-[480px] bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto p-4 gap-4 z-10">
+      <div className="w-full xl:w-[480px] bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto xl:h-full xl:max-h-full p-4 gap-4 z-10">
         {/* Pass Header & Export */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div>
@@ -816,9 +936,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
         {/* INTERACTIVE COMPARISON VIEWER */}
         <div
           ref={comparisonContainerRef}
-          onMouseDown={(e) => {
-            if (viewMode === "swipe") handleContainerPointer(e);
-          }}
+          onMouseDown={handleContainerMouseDown}
           onTouchStart={(e) => {
             if (viewMode === "swipe") handleContainerPointer(e);
           }}
