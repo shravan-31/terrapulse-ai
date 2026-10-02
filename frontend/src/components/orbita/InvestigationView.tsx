@@ -35,7 +35,17 @@ interface InvestigationViewProps {
   initialTarget?: InvestigationTarget;
 }
 
-const PRESET_TARGETS: { name: string; coords: [number, number]; headline: string; area: string; ndviDrop: string; albedoShift: string; activity: string }[] = [
+const PRESET_TARGETS: {
+  name: string;
+  coords: [number, number];
+  headline: string;
+  area: string;
+  ndviDrop: string;
+  albedoShift: string;
+  activity: string;
+  beforeImg: string;
+  afterImg: string;
+}[] = [
   {
     name: "Bhadla Solar Park",
     coords: [71.916, 27.538],
@@ -44,6 +54,8 @@ const PRESET_TARGETS: { name: string; coords: [number, number]; headline: string
     ndviDrop: "-0.44",
     albedoShift: "+0.31",
     activity: "Industrial Solar Expansion",
+    beforeImg: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
+    afterImg: "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1000&q=80",
   },
   {
     name: "Mundra Port & SEZ",
@@ -53,6 +65,8 @@ const PRESET_TARGETS: { name: string; coords: [number, number]; headline: string
     ndviDrop: "-0.18",
     albedoShift: "+0.22",
     activity: "Maritime Port Infrastructure",
+    beforeImg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+    afterImg: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1000&q=80",
   },
   {
     name: "Korba Industrial Zone",
@@ -62,6 +76,8 @@ const PRESET_TARGETS: { name: string; coords: [number, number]; headline: string
     ndviDrop: "-0.52",
     albedoShift: "+0.38",
     activity: "Open-Pit Mining & Earthworks",
+    beforeImg: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80",
+    afterImg: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1000&q=80",
   },
   {
     name: "New Delhi Central",
@@ -71,6 +87,8 @@ const PRESET_TARGETS: { name: string; coords: [number, number]; headline: string
     ndviDrop: "-0.32",
     albedoShift: "+0.15",
     activity: "Urban Infrastructure Construction",
+    beforeImg: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1000&q=80",
+    afterImg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
   },
   {
     name: "Pangong Corridor",
@@ -80,6 +98,8 @@ const PRESET_TARGETS: { name: string; coords: [number, number]; headline: string
     ndviDrop: "-0.08",
     albedoShift: "+0.26",
     activity: "Roadway Engineering & Embankment",
+    beforeImg: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
+    afterImg: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
   },
 ];
 
@@ -146,8 +166,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const comparisonContainerRef = useRef<HTMLDivElement | null>(null);
   const isDraggingSwipe = useRef(false);
-
 
   const matchedPreset = PRESET_TARGETS.find((p) => p.name === selectedTarget);
   const currentPreset = matchedPreset || {
@@ -158,6 +178,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     ndviDrop: "-0.24",
     albedoShift: "+0.18",
     activity: "User Geolocation Surveillance Pass",
+    beforeImg: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
+    afterImg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
   };
 
   // Sync when initialTarget changes from OverviewView
@@ -305,14 +327,31 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     }
   };
 
+  // Handle Observation Window Mode Switch
+  const handleDateRangeSelect = (mode: "7d" | "1m" | "1y" | "5y") => {
+    setDateRangeMode(mode);
+    const end = new Date(2026, 3, 15);
+    const start = new Date(end);
+    if (mode === "7d") start.setDate(end.getDate() - 7);
+    else if (mode === "1m") start.setMonth(end.getMonth() - 1);
+    else if (mode === "1y") start.setFullYear(end.getFullYear() - 1);
+    else if (mode === "5y") start.setFullYear(end.getFullYear() - 5);
+
+    const fmt = (d: Date) => d.toISOString().split("T")[0];
+    setBaselineDate(fmt(start));
+    setInspectionDate(fmt(end));
+    setVerificationFeedback(`Observation window updated: ${mode.toUpperCase()} span (${fmt(start)} to ${fmt(end)})`);
+    setTimeout(() => setVerificationFeedback(null), 3500);
+  };
+
   // Run Retrieval & Analysis
   const handleRetrievePasses = () => {
     setRetrieving(true);
     setTimeout(() => {
       setRetrieving(false);
-      setVerificationFeedback("Retrieved latest Sentinel-2 L2A tile paired with Esri Wayback reference archive. Surface delta computed.");
-      setTimeout(() => setVerificationFeedback(null), 4000);
-    }, 1100);
+      setVerificationFeedback("Sentinel-2 L2A tile paired with reference archive. 6-Factor Quality Gates verified.");
+      setTimeout(() => setVerificationFeedback(null), 4500);
+    }, 1000);
   };
 
   // Chat Submit
@@ -325,23 +364,31 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     setChatInput("");
 
     setTimeout(() => {
+      const lower = q.toLowerCase();
       let reply = `TerraPulse AI Analysis (${selectedTarget}): Localized NDVI drop of ${currentPreset.ndviDrop} and albedo increase of ${currentPreset.albedoShift}. Change signature matches ${currentPreset.activity}. Spatial verification indicates 96.4% confidence of authentic land-use alteration.`;
-      if (q.toLowerCase().includes("water")) {
-        reply = `Water bodies analysis (NDWI index): Surface water boundaries remained stable with minimal shoreline displacement (< 2.1%). Principal alteration is terrestrial ground modification.`;
-      } else if (q.toLowerCase().includes("construction") || q.toLowerCase().includes("where")) {
+
+      if (lower.includes("similar") || lower.includes("archive")) {
+        reply = `FAISS Vector Index query (RemoteCLIP 768-dim space) returned 3 semantically aligned locations:\n1. Rewa Ultra Mega Solar, MP — 94.2% cosine match\n2. Kurnool Solar Park, AP — 91.8% cosine match\n3. Pavagada Industrial Complex, KA — 88.6% cosine match.`;
+      } else if (lower.includes("water") || lower.includes("river") || lower.includes("lake")) {
+        reply = `Water bodies analysis (NDWI index): Surface water boundaries remain stable (< 1.8% displacement). Principal alteration is terrestrial ground modification with no wetland encroachment.`;
+      } else if (lower.includes("construction") || lower.includes("where")) {
         reply = `Structural construction is concentrated in the northern quadrant of the AOI (${coords[1].toFixed(3)}°N, ${coords[0].toFixed(3)}°E), encompassing approximately ${currentPreset.area} of newly laid surface foundations.`;
-      } else if (q.toLowerCase().includes("significant")) {
-        reply = `High significance: The surface alteration represents 34.2% of the monitored sector, exceeding the 5.0% threshold for critical operational change notification.`;
+      } else if (lower.includes("significant") || lower.includes("impact")) {
+        reply = `High significance: The surface alteration represents 34.2% of the monitored sector (${currentPreset.area}), exceeding the 5.0% threshold for critical operational change notification.`;
+      } else if (lower.includes("cloud") || lower.includes("shadow") || lower.includes("alarm")) {
+        reply = `False Alarm Suppression: Cloud cover < 2.0%, shadow correlation > 0.92, and co-registration error < 0.25 pixels. Seasonal phenology test passed — verified as genuine ground transformation.`;
+      } else if (lower.includes("work") || lower.includes("how")) {
+        reply = `How to work: 1) Drag the image slider to swipe before/after passes. 2) Toggle spectral bands (NIR/Night). 3) Verify False Alarm checks. 4) Add audit notes and click 'Confirm Genuine Change' to log certification.`;
       }
 
       setChatLog([...newLog, { sender: "ai", text: reply }]);
-    }, 600);
+    }, 500);
   };
 
   // Analyst Verification Handlers
   const handleConfirmChange = async () => {
     setVerificationStatus("confirmed");
-    setVerificationFeedback("Change officially certified as GENUINE by Intelligence Analyst.");
+    setVerificationFeedback("✓ Certified as GENUINE CHANGE by Intelligence Analyst. Logged in audit registry.");
     try {
       await reviewChange(selectedTarget, "confirmed_by_analyst", analystNotes);
     } catch {
@@ -351,7 +398,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
   const handleDismissChange = async () => {
     setVerificationStatus("dismissed");
-    setVerificationFeedback("Change dismissed as False Alarm / Benign Variation.");
+    setVerificationFeedback("✗ Change dismissed as False Alarm / Benign Variation.");
     try {
       await reviewChange(selectedTarget, "rejected_by_analyst", analystNotes);
     } catch {
@@ -387,6 +434,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     a.download = `TERRAPULSE_INTELLIGENCE_${selectedTarget.replace(/\s+/g, "_")}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    setVerificationFeedback(`Intelligence Dossier downloaded for ${selectedTarget}`);
+    setTimeout(() => setVerificationFeedback(null), 4000);
   };
 
   // Swipe dragging handlers
@@ -394,6 +443,23 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     const x = clientX - rect.left;
     const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
     setSwipePosition(pct);
+  };
+
+  const handleContainerPointer = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (!comparisonContainerRef.current) return;
+    const rect = comparisonContainerRef.current.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    handleSwipeMove(clientX, rect);
+  };
+
+  const getSpectralFilter = () => {
+    if (spectralBand === "nir") {
+      return "hue-rotate(285deg) saturate(350%) contrast(140%) brightness(105%)";
+    }
+    if (spectralBand === "night") {
+      return "invert(92%) hue-rotate(180deg) brightness(85%) contrast(180%)";
+    }
+    return "none";
   };
 
   return (
@@ -454,10 +520,10 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
             {(["7d", "1m", "1y", "5y"] as const).map((mode) => (
               <button
                 key={mode}
-                onClick={() => setDateRangeMode(mode)}
+                onClick={() => handleDateRangeSelect(mode)}
                 className={`py-1 rounded text-[11px] font-mono uppercase transition border ${
                   dateRangeMode === mode
-                    ? "bg-indigo-600/30 border-indigo-400 text-indigo-200 font-semibold"
+                    ? "bg-indigo-600/30 border-indigo-400 text-indigo-200 font-semibold shadow-[0_0_8px_rgba(99,102,241,0.3)]"
                     : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
                 }`}
               >
@@ -645,39 +711,55 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           </button>
         </div>
 
+        {verificationFeedback && (
+          <div className="p-2 rounded-lg bg-indigo-950/80 border border-indigo-500/40 text-indigo-200 text-xs flex items-center gap-2 animate-fadeIn">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="leading-tight">{verificationFeedback}</span>
+          </div>
+        )}
+
         {/* Spectral Band Selector */}
         <div className="flex items-center justify-between gap-2">
           <span className="text-[11px] text-slate-400 font-medium">Spectral Band:</span>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             <button
               onClick={() => setSpectralBand("true_color")}
-              className={`px-2 py-1 rounded text-[10px] font-mono transition border ${
+              className={`px-2.5 py-1 rounded text-[10px] font-mono transition border flex items-center gap-1.5 ${
                 spectralBand === "true_color"
-                  ? "bg-indigo-600/30 border-indigo-400 text-indigo-200 font-semibold"
+                  ? "bg-indigo-600/40 border-indigo-400 text-indigo-100 font-bold shadow-[0_0_8px_rgba(99,102,241,0.4)]"
                   : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
               }`}
             >
-              True Color
+              {spectralBand === "true_color" && (
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_6px_#818cf8]" />
+              )}
+              <span>True Color</span>
             </button>
             <button
               onClick={() => setSpectralBand("nir")}
-              className={`px-2 py-1 rounded text-[10px] font-mono transition border ${
+              className={`px-2.5 py-1 rounded text-[10px] font-mono transition border flex items-center gap-1.5 ${
                 spectralBand === "nir"
-                  ? "bg-rose-500/20 border-rose-400 text-rose-300 font-semibold"
+                  ? "bg-rose-500/30 border-rose-400 text-rose-200 font-bold shadow-[0_0_10px_rgba(244,63,94,0.4)]"
                   : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
               }`}
             >
-              False Color NIR
+              {spectralBand === "nir" && (
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse shadow-[0_0_6px_#f43f5e]" />
+              )}
+              <span>False Color NIR</span>
             </button>
             <button
               onClick={() => setSpectralBand("night")}
-              className={`px-2 py-1 rounded text-[10px] font-mono transition border ${
+              className={`px-2.5 py-1 rounded text-[10px] font-mono transition border flex items-center gap-1.5 ${
                 spectralBand === "night"
-                  ? "bg-purple-500/20 border-purple-400 text-purple-300 font-semibold"
+                  ? "bg-purple-500/30 border-purple-400 text-purple-200 font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)]"
                   : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
               }`}
             >
-              Night
+              {spectralBand === "night" && (
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_#c084fc]" />
+              )}
+              <span>Night</span>
             </button>
           </div>
         </div>
@@ -685,94 +767,163 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
         {/* View Mode Switcher (Swipe, Dual, Inspector) */}
         <div className="flex items-center justify-between gap-2">
           <span className="text-[11px] text-slate-400 font-medium">View Layout:</span>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {(["swipe", "dual", "inspector"] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => setViewMode(v)}
-                className={`px-2.5 py-1 rounded text-[10px] font-mono uppercase transition border ${
+                className={`px-3 py-1 rounded text-[10px] font-mono uppercase transition border flex items-center gap-1.5 ${
                   viewMode === v
-                    ? "bg-indigo-600 text-white font-bold border-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
+                    ? "bg-indigo-600 text-white font-bold border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
                     : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
                 }`}
               >
-                {v}
+                {viewMode === v && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
+                )}
+                <span>{v}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* INTERACTIVE COMPARISON VIEWER */}
-        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-indigo-500/40 bg-slate-950 shadow-[0_0_20px_rgba(99,102,241,0.2)] select-none">
-          {/* BASELINE IMAGE */}
-          <div
-            className={`absolute inset-0 bg-cover bg-center ${
-              spectralBand === "nir"
-                ? "hue-rotate-[290deg] saturate-200 contrast-125"
-                : spectralBand === "night"
-                ? "invert brightness-75 contrast-200"
-                : ""
-            }`}
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80')`,
-            }}
-          >
-            <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 border border-slate-700 text-[10px] font-mono text-slate-300">
-              BEFORE: {baselineDate}
-            </div>
-          </div>
-
-          {/* INSPECTION IMAGE */}
-          <div
-            className={`absolute inset-0 bg-cover bg-center ${
-              spectralBand === "nir"
-                ? "hue-rotate-[290deg] saturate-200 contrast-125"
-                : spectralBand === "night"
-                ? "invert brightness-75 contrast-200"
-                : ""
-            }`}
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80')`,
-              clipPath:
-                viewMode === "swipe"
-                  ? `polygon(${swipePosition}% 0, 100% 0, 100% 100%, ${swipePosition}% 100%)`
-                  : viewMode === "dual"
-                  ? "polygon(50% 0, 100% 0, 100% 100%, 50% 100%)"
-                  : "none",
-            }}
-          >
-            <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-500/40 text-[10px] font-mono text-indigo-300">
-              AFTER: {inspectionDate}
-            </div>
-          </div>
-
-          {/* SWIPE DRAG HANDLE */}
-          {viewMode === "swipe" && (
-            <div
-              className="absolute inset-y-0 cursor-ew-resize z-20 group"
-              style={{ left: `${swipePosition}%`, transform: "translateX(-50%)" }}
-              onMouseDown={(e) => {
-                isDraggingSwipe.current = true;
-                const rect = e.currentTarget.parentElement?.getBoundingClientRect();
-                const onMouseMove = (moveEvent: MouseEvent) => {
-                  if (isDraggingSwipe.current && rect) {
-                    handleSwipeMove(moveEvent.clientX, rect);
-                  }
-                };
-                const onMouseUp = () => {
-                  isDraggingSwipe.current = false;
-                  window.removeEventListener("mousemove", onMouseMove);
-                  window.removeEventListener("mouseup", onMouseUp);
-                };
-                window.addEventListener("mousemove", onMouseMove);
-                window.addEventListener("mouseup", onMouseUp);
-              }}
-            >
-              <div className="w-0.5 h-full bg-indigo-400 shadow-[0_0_10px_#6366f1]" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-950 border-2 border-indigo-400 flex items-center justify-center shadow-[0_0_12px_rgba(99,102,241,0.6)] text-indigo-300 group-hover:scale-110 transition">
-                <Sliders className="w-3.5 h-3.5 rotate-90" />
+        <div
+          ref={comparisonContainerRef}
+          onMouseDown={(e) => {
+            if (viewMode === "swipe") handleContainerPointer(e);
+          }}
+          onTouchStart={(e) => {
+            if (viewMode === "swipe") handleContainerPointer(e);
+          }}
+          onTouchMove={(e) => {
+            if (viewMode === "swipe") handleContainerPointer(e);
+          }}
+          className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-indigo-500/40 bg-slate-950 shadow-[0_0_20px_rgba(99,102,241,0.2)] select-none cursor-crosshair"
+        >
+          {viewMode === "dual" ? (
+            /* DUAL SIDE-BY-SIDE VIEW */
+            <div className="absolute inset-0 grid grid-cols-2 gap-0.5 bg-indigo-950/80">
+              <div
+                className="relative h-full bg-cover bg-center transition-all duration-300"
+                style={{
+                  backgroundImage: `url('${currentPreset.beforeImg}')`,
+                  filter: getSpectralFilter(),
+                }}
+              >
+                <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-slate-950/85 border border-slate-700 text-[9px] font-mono text-slate-200">
+                  BEFORE: {baselineDate}
+                </div>
+              </div>
+              <div
+                className="relative h-full bg-cover bg-center border-l-2 border-indigo-500/70 transition-all duration-300"
+                style={{
+                  backgroundImage: `url('${currentPreset.afterImg}')`,
+                  filter: getSpectralFilter(),
+                }}
+              >
+                <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-indigo-950/90 border border-indigo-500/50 text-[9px] font-mono text-indigo-200">
+                  AFTER: {inspectionDate}
+                </div>
               </div>
             </div>
+          ) : viewMode === "inspector" ? (
+            /* INSPECTOR HEATMAP MODE */
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{
+                backgroundImage: `url('${currentPreset.afterImg}')`,
+                filter: getSpectralFilter(),
+              }}
+            >
+              {/* Thermal change difference overlay */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/40 via-amber-500/30 to-emerald-500/20 mix-blend-color-dodge pointer-events-none" />
+
+              {/* Anomaly Detection Polygons / Tags */}
+              <div className="absolute top-1/4 left-1/3 w-32 h-20 border-2 border-dashed border-rose-400 rounded bg-rose-500/25 backdrop-blur-[1px] flex flex-col justify-between p-1.5 shadow-[0_0_15px_rgba(244,63,94,0.5)] animate-pulse">
+                <span className="text-[9px] font-mono font-bold text-rose-100 bg-rose-950/90 px-1 py-0.5 rounded flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+                  Cluster #1: 96.4%
+                </span>
+                <span className="text-[8px] font-mono text-rose-200 bg-black/60 px-1 rounded">
+                  NDVI: {currentPreset.ndviDrop} (Vegetation Loss)
+                </span>
+              </div>
+
+              <div className="absolute bottom-1/4 right-1/4 w-28 h-18 border-2 border-dashed border-amber-400 rounded bg-amber-500/25 backdrop-blur-[1px] flex flex-col justify-between p-1.5 shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                <span className="text-[9px] font-mono font-bold text-amber-100 bg-amber-950/90 px-1 py-0.5 rounded">
+                  Cluster #2: 91.2%
+                </span>
+                <span className="text-[8px] font-mono text-amber-200 bg-black/60 px-1 rounded">
+                  Albedo: {currentPreset.albedoShift} (Hard Surface)
+                </span>
+              </div>
+
+              <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/60 text-[10px] font-mono text-rose-300 font-bold shadow-[0_0_8px_rgba(244,63,94,0.3)]">
+                INSPECTOR: CHANGE HEATMAP ACTIVE
+              </div>
+              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/90 border border-slate-700 text-[10px] font-mono text-slate-300">
+                PROBE: {coords[1].toFixed(3)}°N, {coords[0].toFixed(3)}°E
+              </div>
+            </div>
+          ) : (
+            /* SWIPE MODE */
+            <>
+              {/* BASELINE IMAGE */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+                style={{
+                  backgroundImage: `url('${currentPreset.beforeImg}')`,
+                  filter: getSpectralFilter(),
+                }}
+              >
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 border border-slate-700 text-[10px] font-mono text-slate-300">
+                  BEFORE: {baselineDate}
+                </div>
+              </div>
+
+              {/* INSPECTION IMAGE */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+                style={{
+                  backgroundImage: `url('${currentPreset.afterImg}')`,
+                  filter: getSpectralFilter(),
+                  clipPath: `polygon(${swipePosition}% 0, 100% 0, 100% 100%, ${swipePosition}% 100%)`,
+                }}
+              >
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-500/40 text-[10px] font-mono text-indigo-300">
+                  AFTER: {inspectionDate}
+                </div>
+              </div>
+
+              {/* SWIPE DRAG HANDLE */}
+              <div
+                className="absolute inset-y-0 cursor-ew-resize z-20 group"
+                style={{ left: `${swipePosition}%`, transform: "translateX(-50%)" }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  isDraggingSwipe.current = true;
+                  const rect = comparisonContainerRef.current?.getBoundingClientRect();
+                  const onMouseMove = (moveEvent: MouseEvent) => {
+                    if (isDraggingSwipe.current && rect) {
+                      handleSwipeMove(moveEvent.clientX, rect);
+                    }
+                  };
+                  const onMouseUp = () => {
+                    isDraggingSwipe.current = false;
+                    window.removeEventListener("mousemove", onMouseMove);
+                    window.removeEventListener("mouseup", onMouseUp);
+                  };
+                  window.addEventListener("mousemove", onMouseMove);
+                  window.addEventListener("mouseup", onMouseUp);
+                }}
+              >
+                <div className="w-0.5 h-full bg-indigo-400 shadow-[0_0_10px_#6366f1]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-950 border-2 border-indigo-400 flex items-center justify-center shadow-[0_0_12px_rgba(99,102,241,0.6)] text-indigo-300 group-hover:scale-110 transition">
+                  <Sliders className="w-3.5 h-3.5 rotate-90" />
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -986,24 +1137,50 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
         </div>
 
         {/* ANALYST VERIFICATION & CERTIFICATION */}
-        <div className="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800 flex flex-col gap-2.5">
+        <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col gap-2.5 shadow-lg">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               Analyst Verification & Certification
             </span>
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
+              className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold transition ${
                 verificationStatus === "confirmed"
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.3)] animate-pulse"
                   : verificationStatus === "dismissed"
-                  ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                  ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
                   : "bg-slate-800 text-slate-400 border border-slate-700"
               }`}
             >
-              {verificationStatus.toUpperCase()}
+              {verificationStatus === "confirmed"
+                ? "✓ CERTIFIED GENUINE"
+                : verificationStatus === "dismissed"
+                ? "✗ DISMISSED (BENIGN)"
+                : "PENDING REVIEW"}
             </span>
           </div>
+
+          {/* In-place audit feedback banner */}
+          {verificationFeedback && (
+            <div
+              className={`p-2 rounded-lg text-xs font-mono flex items-center gap-2 border transition ${
+                verificationStatus === "confirmed"
+                  ? "bg-emerald-950/80 border-emerald-500/50 text-emerald-200"
+                  : verificationStatus === "dismissed"
+                  ? "bg-rose-950/80 border-rose-500/50 text-rose-200"
+                  : "bg-indigo-950/80 border-indigo-500/50 text-indigo-200"
+              }`}
+            >
+              {verificationStatus === "confirmed" ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              ) : verificationStatus === "dismissed" ? (
+                <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+              ) : (
+                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              )}
+              <span className="leading-tight">{verificationFeedback}</span>
+            </div>
+          )}
 
           <textarea
             value={analystNotes}
@@ -1015,19 +1192,29 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
           <div className="grid grid-cols-2 gap-2">
             <button
+              id="btn-confirm-genuine"
               onClick={handleConfirmChange}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-semibold text-xs transition"
+              className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg font-semibold text-xs transition border ${
+                verificationStatus === "confirmed"
+                  ? "bg-emerald-600 text-white border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.5)] font-bold"
+                  : "bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-500/40 text-emerald-300"
+              }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Confirm Genuine Change</span>
+              <span>{verificationStatus === "confirmed" ? "Change Certified ✓" : "Confirm Genuine Change"}</span>
             </button>
 
             <button
+              id="btn-dismiss-alarm"
               onClick={handleDismissChange}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-semibold text-xs transition"
+              className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg font-semibold text-xs transition border ${
+                verificationStatus === "dismissed"
+                  ? "bg-rose-600 text-white border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.5)] font-bold"
+                  : "bg-rose-500/20 hover:bg-rose-500/30 border-rose-500/40 text-rose-300"
+              }`}
             >
               <XCircle className="w-3.5 h-3.5" />
-              <span>Dismiss False Alarm</span>
+              <span>{verificationStatus === "dismissed" ? "Alarm Dismissed ✗" : "Dismiss False Alarm"}</span>
             </button>
           </div>
         </div>

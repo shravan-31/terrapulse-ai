@@ -7,13 +7,19 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "http://127.0.0.1:8000",
         changeOrigin: true,
+        secure: false,
         configure: (proxy) => {
           proxy.on("error", (err: any, _req, res: any) => {
-            if (err.code === "ECONNREFUSED" && res && !res.headersSent && typeof res.writeHead === "function") {
+            if (res && !res.headersSent && typeof res.writeHead === "function") {
               res.writeHead(503, { "Content-Type": "application/json" });
-              res.end(JSON.stringify({ error: "Backend server offline on http://localhost:8000" }));
+              res.end(
+                JSON.stringify({
+                  error: "Backend server offline or starting on http://127.0.0.1:8000",
+                  code: err.code || "ECONNREFUSED",
+                })
+              );
             }
           });
         },

@@ -5,7 +5,7 @@ REM =========================================================================
 cd /d "%~dp0"
 
 echo =========================================================================
-echo   TerraPulse AI - Pushing Permission Guide & Live GPS Updates to GitHub
+echo   TerraPulse AI - Pushing Console Upgrades, Spectral Bands & API Fixes
 echo =========================================================================
 echo.
 
@@ -15,7 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "feat(siamese-cd): integrate trained ChangeFormerV6 model, live model metrics card, and SIH 26227 semantic queries"
+git commit -m "feat(investigation-console): enhance satellite pass comparison, spectral NIR filters, inspector heatmap, resilient proxy, and analyst verification"
 
 
 echo.
