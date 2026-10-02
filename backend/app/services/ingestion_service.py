@@ -101,9 +101,15 @@ async def ingest_raster_file(
         v_id = uuid.uuid4().int & 0x7FFFFFFFFFFFFFFF
         vector_ids.append(v_id)
 
-    # Add to FAISS index
+    # Add to FAISS index and persist to disk (Section 17)
     if vector_ids:
         index_mgr.index.add(vector_ids=vector_ids, vectors=embeddings)
+        try:
+            idx_dir = DATA_DIR / "indexes"
+            idx_dir.mkdir(parents=True, exist_ok=True)
+            index_mgr.index.save(str(idx_dir / "image.index"))
+        except Exception:
+            pass
 
     # 6. Add to STAC Catalog
     stac_assets = {

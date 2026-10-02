@@ -152,6 +152,8 @@ def create_app() -> FastAPI:
     from app.api.changes import router as changes_router
     from app.api.reviews import router as reviews_router
     from app.api.catalog import router as catalog_router
+    from app.api.diagnostics import router as diagnostics_router
+    from app.api.verification import router as verification_router
 
     app.include_router(query_router)
     app.include_router(aoi_router)
@@ -171,6 +173,8 @@ def create_app() -> FastAPI:
     app.include_router(changes_router)
     app.include_router(reviews_router)
     app.include_router(catalog_router)
+    app.include_router(diagnostics_router)
+    app.include_router(verification_router)
 
     # ---- WebSocket live job progress endpoint (Section 25) ----
     from fastapi import WebSocket, WebSocketDisconnect

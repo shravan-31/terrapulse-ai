@@ -12,7 +12,7 @@ git add .
 git status --short
 
 Write-Host "`n[2/3] Creating commit..." -ForegroundColor Yellow
-git commit -m "feat(offline-platform): complete offline satellite intelligence platform with model abstraction, classical/deep change detection, geospatial raster engine, local STAC catalog, ReportLab PDF reports, and Ingest UI"
+git commit -m "feat(offline-platform): end-to-end verified offline platform with diagnostics API, system diagnostics UI, automated verification suite, and setup scripts"
 
 Write-Host "`n[3/3] Pushing to origin main..." -ForegroundColor Yellow
 git push origin main

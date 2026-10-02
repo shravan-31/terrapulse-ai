@@ -661,5 +661,13 @@ export async function fetchSimilarSitesApi(payload: {
   return resp.json();
 }
 
+export async function fetchDiagnosticsApi(): Promise<any> {
+  const resp = await fetch("/api/diagnostics");
+  if (!resp.ok) throw new Error(`Diagnostics fetch failed: HTTP ${resp.status}`);
+  return resp.json();
+}
+
+
+
 
 

@@ -1,0 +1,35 @@
+# TerraPulse AI — Model Registry and Hardware Mapping
+embedding_models:
+  primary:
+    provider: "remoteclip"
+    name: "RemoteCLIP-ViT-L-14"
+    weights_path: "./models/remoteclip/RemoteCLIP-ViT-L-14.pt"
+    dimension: 768
+    device: "auto"
+    normalize_l2: true
+  fallback:
+    provider: "openclip"
+    name: "ViT-B-32"
+    pretrained: "laion2b_s34b_b79k"
+    dimension: 512
+    device: "auto"
+  offline_deterministic:
+    provider: "clip_offline"
+    name: "DeterministicAirGappedEncoder"
+    dimension: 768
+    device: "cpu"
+
+change_detection_models:
+  primary:
+    provider: "classical"
+    name: "MultiSpectralSpectralDelta"
+    version: "2.1.0"
+    min_area_m2: 900.0
+    threshold: 0.55
+  deep:
+    provider: "siamese_v6"
+    name: "ChangeFormerV6"
+    weights_path: "./models/changeformer/ChangeFormerV6.pth"
+    in_channels: 3
+    num_classes: 2
+    device: "auto"

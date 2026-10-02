@@ -30,6 +30,7 @@ import { OverviewView } from "./components/terrapulse/OverviewView";
 import { InvestigationView, InvestigationTarget } from "./components/terrapulse/InvestigationView";
 import { SemanticSearchView } from "./components/terrapulse/SemanticSearchView";
 import { IngestModal } from "./components/IngestModal";
+import { DiagnosticsModal } from "./components/DiagnosticsModal";
 import { fetchHealth } from "./services/api";
 import { SystemHealth } from "./types";
 import { useSettingsStore } from "./stores/settingsStore";
@@ -43,6 +44,7 @@ export function App() {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showIngestModal, setShowIngestModal] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [sihOfflineMode, setSihOfflineMode] = useState(false);
 
   const { reduceAnimations, setReduceAnimations } = useSettingsStore();
@@ -170,14 +172,22 @@ export function App() {
 
 
           {/* AI Model Badge */}
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-[11px] font-mono text-indigo-200 shadow-[0_0_10px_rgba(99,102,241,0.25)]">
+          <div
+            onClick={() => setShowDiagnostics(true)}
+            className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 hover:border-indigo-400/80 text-[11px] font-mono text-indigo-200 shadow-[0_0_10px_rgba(99,102,241,0.25)] cursor-pointer transition"
+            title="Click to view AI & Model Diagnostics"
+          >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
             <span className="font-semibold text-emerald-300">AI:</span>
             <span>ChangeFormerV6 (8.08 MB)</span>
           </div>
 
           {/* Telemetry Status Badge */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-indigo-950 text-[11px] font-mono text-slate-300 shadow-sm">
+          <div
+            onClick={() => setShowDiagnostics(true)}
+            className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-indigo-950 hover:border-indigo-500/60 text-[11px] font-mono text-slate-300 shadow-sm cursor-pointer transition"
+            title="Click to view full System Diagnostics"
+          >
             <span className={`w-2 h-2 rounded-full ${sihOfflineMode ? "bg-cyan-400" : "bg-emerald-400"} animate-pulse shadow-[0_0_8px_${sihOfflineMode ? "#22d3ee" : "#34d399"}]`} />
             <span>
               {sihOfflineMode
@@ -253,6 +263,18 @@ export function App() {
               <span className="text-cyan-400 font-mono">{sihOfflineMode ? "Local Factual" : "Groq / Local"}</span>
             </div>
           </div>
+
+          <button
+            id="btn-open-diagnostics"
+            onClick={() => {
+              setShowSettings(false);
+              setShowDiagnostics(true);
+            }}
+            className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 text-xs font-semibold transition"
+          >
+            <Activity className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Open System Diagnostics</span>
+          </button>
         </div>
       )}
 
@@ -275,6 +297,12 @@ export function App() {
         onSuccess={() => {
           setActiveView("investigate");
         }}
+      />
+
+      {/* Real-time System Diagnostics Modal (Section 40) */}
+      <DiagnosticsModal
+        isOpen={showDiagnostics}
+        onClose={() => setShowDiagnostics(false)}
       />
     </div>
 
