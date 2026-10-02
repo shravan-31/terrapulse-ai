@@ -15,7 +15,7 @@ git status --short
 
 echo.
 echo [2/3] Committing changes...
-git commit -m "fix(ui): fix spectral bands, view layout switching, and mouse-drag for laptops and desktops"
+git commit -m "feat(change-detection): add high-visibility change bounding polygons, delta mask toggle, and zone breakdown cards for Before vs After comparison"
 
 echo.
 echo [3/3] Pushing to GitHub...

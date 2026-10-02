@@ -31,6 +31,20 @@ export interface InvestigationTarget {
   coords: [number, number]; // [lng, lat]
 }
 
+export interface DetectedChangeZone {
+  id: string;
+  label: string;
+  category: string;
+  confidence: number;
+  topPct: number;
+  leftPct: number;
+  widthPct: number;
+  heightPct: number;
+  color: string;
+  areaHa: number;
+  deltaSummary: string;
+}
+
 interface InvestigationViewProps {
   initialTarget?: InvestigationTarget;
 }
@@ -45,6 +59,7 @@ const PRESET_TARGETS: {
   activity: string;
   beforeImg: string;
   afterImg: string;
+  changeFeatures: DetectedChangeZone[];
 }[] = [
   {
     name: "Bhadla Solar Park",
@@ -56,6 +71,34 @@ const PRESET_TARGETS: {
     activity: "Industrial Solar Expansion",
     beforeImg: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
     afterImg: "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1000&q=80",
+    changeFeatures: [
+      {
+        id: "bhadla-zone-1",
+        label: "New Photovoltaic Array Blocks 14-28",
+        category: "Solar PV Infrastructure",
+        confidence: 97.8,
+        topPct: 22,
+        leftPct: 15,
+        widthPct: 52,
+        heightPct: 46,
+        color: "#38bdf8",
+        areaHa: 84.6,
+        deltaSummary: "Desert barren sand converted to high-density tracker PV panels with concrete footings",
+      },
+      {
+        id: "bhadla-zone-2",
+        label: "400kV Inverter Station & Grid Substation",
+        category: "Electrical Grid Infrastructure",
+        confidence: 94.2,
+        topPct: 46,
+        leftPct: 68,
+        widthPct: 24,
+        heightPct: 34,
+        color: "#f59e0b",
+        areaHa: 18.2,
+        deltaSummary: "Reinforced concrete transformer pads poured and high-voltage transmission bay built",
+      },
+    ],
   },
   {
     name: "Mundra Port & SEZ",
@@ -67,6 +110,34 @@ const PRESET_TARGETS: {
     activity: "Maritime Port Infrastructure",
     beforeImg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
     afterImg: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1000&q=80",
+    changeFeatures: [
+      {
+        id: "mundra-zone-1",
+        label: "Deepwater Container Berth Pier #4 Extension",
+        category: "Maritime Wharf & Berth",
+        confidence: 96.5,
+        topPct: 30,
+        leftPct: 26,
+        widthPct: 48,
+        heightPct: 38,
+        color: "#34d399",
+        areaHa: 36.4,
+        deltaSummary: "240m concrete pier structure built into tidal channel with ship mooring bollards",
+      },
+      {
+        id: "mundra-zone-2",
+        label: "Reclaimed Cargo Stacking Yard",
+        category: "Tidal Land Reclamation",
+        confidence: 92.8,
+        topPct: 15,
+        leftPct: 10,
+        widthPct: 30,
+        heightPct: 30,
+        color: "#f43f5e",
+        areaHa: 24.1,
+        deltaSummary: "Tidal mudflat reclaimed, leveled and paved for rubber-tyred gantry crane storage",
+      },
+    ],
   },
   {
     name: "Korba Industrial Zone",
@@ -78,6 +149,34 @@ const PRESET_TARGETS: {
     activity: "Open-Pit Mining & Earthworks",
     beforeImg: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80",
     afterImg: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1000&q=80",
+    changeFeatures: [
+      {
+        id: "korba-zone-1",
+        label: "Terraced Open-Pit Excavation Cut",
+        category: "Mining Excavation Bench",
+        confidence: 98.1,
+        topPct: 26,
+        leftPct: 20,
+        widthPct: 54,
+        heightPct: 48,
+        color: "#f43f5e",
+        areaHa: 112.5,
+        deltaSummary: "Vegetation cleared and deep mechanical soil cut made to expose mineral seam",
+      },
+      {
+        id: "korba-zone-2",
+        label: "Overburden Dumping & Spoil Mound",
+        category: "Earthmoving Spoil Dump",
+        confidence: 93.6,
+        topPct: 16,
+        leftPct: 70,
+        widthPct: 24,
+        heightPct: 30,
+        color: "#fb923c",
+        areaHa: 42.0,
+        deltaSummary: "Terraced spoil dump expanded into adjacent clearing with haul truck access tracks",
+      },
+    ],
   },
   {
     name: "New Delhi Central",
@@ -89,6 +188,34 @@ const PRESET_TARGETS: {
     activity: "Urban Infrastructure Construction",
     beforeImg: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1000&q=80",
     afterImg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
+    changeFeatures: [
+      {
+        id: "delhi-zone-1",
+        label: "Multi-Storey Commercial Complex",
+        category: "Commercial Building",
+        confidence: 95.3,
+        topPct: 24,
+        leftPct: 28,
+        widthPct: 46,
+        heightPct: 44,
+        color: "#818cf8",
+        areaHa: 14.8,
+        deltaSummary: "Steel-reinforced building structural core erected and exterior glazed facade fitted",
+      },
+      {
+        id: "delhi-zone-2",
+        label: "Expressway Ramp & Grade Separation",
+        category: "Transit Corridor",
+        confidence: 91.5,
+        topPct: 66,
+        leftPct: 16,
+        widthPct: 64,
+        heightPct: 24,
+        color: "#38bdf8",
+        areaHa: 9.6,
+        deltaSummary: "Flyover pillars cast and dual-lane elevated highway ramp paved",
+      },
+    ],
   },
   {
     name: "Pangong Corridor",
@@ -100,6 +227,34 @@ const PRESET_TARGETS: {
     activity: "Roadway Engineering & Embankment",
     beforeImg: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
     afterImg: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
+    changeFeatures: [
+      {
+        id: "pangong-zone-1",
+        label: "All-Weather Strategic Highway Pavement",
+        category: "Bitumen Roadway",
+        confidence: 96.9,
+        topPct: 36,
+        leftPct: 14,
+        widthPct: 70,
+        heightPct: 30,
+        color: "#22c55e",
+        areaHa: 28.4,
+        deltaSummary: "Unpaved dirt corridor widened and surfaced with heavy military-grade asphalt",
+      },
+      {
+        id: "pangong-zone-2",
+        label: "Reinforced Concrete Culverts & Retaining Berm",
+        category: "Civil Works Berm",
+        confidence: 93.4,
+        topPct: 18,
+        leftPct: 40,
+        widthPct: 28,
+        heightPct: 24,
+        color: "#f59e0b",
+        areaHa: 6.2,
+        deltaSummary: "Seasonal mountain wash diversion culverts and gabion retaining walls completed",
+      },
+    ],
   },
 ];
 
@@ -120,6 +275,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
   const [spectralBand, setSpectralBand] = useState<"true_color" | "nir" | "night">("true_color");
   const [viewMode, setViewMode] = useState<"swipe" | "dual" | "inspector">("swipe");
   const [swipePosition, setSwipePosition] = useState(50); // percentage
+  const [showChangeHighlights, setShowChangeHighlights] = useState(true);
+  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
 
   const [heatmapEnabled, setHeatmapEnabled] = useState(true);
   const [map3D, setMap3D] = useState(false);
@@ -180,6 +337,21 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     activity: "User Geolocation Surveillance Pass",
     beforeImg: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
     afterImg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+    changeFeatures: [
+      {
+        id: "custom-zone-1",
+        label: "Primary Ground Delta Zone",
+        category: "Surface Modification",
+        confidence: 95.8,
+        topPct: 30,
+        leftPct: 25,
+        widthPct: 50,
+        heightPct: 40,
+        color: "#f43f5e",
+        areaHa: 48.6,
+        deltaSummary: "Direct satellite surface transformation flagged by ChangeFormer V6",
+      },
+    ],
   };
 
   // Sync when initialTarget changes from OverviewView
@@ -540,6 +712,115 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
       }
     }
   }, [viewMode, heatmapEnabled]);
+
+  // Render high-contrast AI change detection bounding boxes and callouts
+  const renderChangePolygons = (isBefore: boolean) => {
+    if (!showChangeHighlights) return null;
+    const zones = currentPreset.changeFeatures || [];
+
+    if (isBefore) {
+      // In BEFORE mode: show pre-modification baseline boundary
+      return (
+        <div className="absolute inset-0 pointer-events-none z-10">
+          {zones.map((zone) => {
+            const isSelected = selectedZoneId === zone.id;
+            return (
+              <div
+                key={`before-${zone.id}`}
+                className="absolute transition-all duration-300 pointer-events-auto cursor-pointer"
+                style={{
+                  top: `${zone.topPct}%`,
+                  left: `${zone.leftPct}%`,
+                  width: `${zone.widthPct}%`,
+                  height: `${zone.heightPct}%`,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedZoneId(isSelected ? null : zone.id);
+                }}
+              >
+                <div
+                  className={`w-full h-full border-2 border-dashed rounded-lg transition-all ${
+                    isSelected
+                      ? "border-cyan-400 bg-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+                      : "border-slate-400/50 bg-slate-900/10 hover:border-cyan-400/80"
+                  }`}
+                />
+                <div className="absolute -top-3 left-2 px-1.5 py-0.5 rounded bg-slate-950/90 border border-slate-700 text-[8px] font-mono text-slate-300 whitespace-nowrap shadow-md">
+                  BASELINE: Natural ({zone.areaHa} ha)
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // In AFTER mode: show high-visibility AI change detection highlights
+    return (
+      <div className="absolute inset-0 pointer-events-none z-10">
+        {zones.map((zone) => {
+          const isSelected = selectedZoneId === zone.id;
+          const color = zone.color || "#f43f5e";
+          return (
+            <div
+              key={`after-${zone.id}`}
+              className="absolute transition-all duration-300 pointer-events-auto cursor-pointer group"
+              style={{
+                top: `${zone.topPct}%`,
+                left: `${zone.leftPct}%`,
+                width: `${zone.widthPct}%`,
+                height: `${zone.heightPct}%`,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedZoneId(isSelected ? null : zone.id);
+              }}
+            >
+              {/* Neon glowing animated change bounding box */}
+              <div
+                className={`w-full h-full border-2 rounded-lg transition-all relative flex flex-col justify-between p-1.5 ${
+                  isSelected
+                    ? "border-white bg-rose-500/35 shadow-[0_0_25px_rgba(244,63,94,0.85)] scale-[1.02]"
+                    : "bg-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.5)] hover:border-white hover:bg-rose-500/30"
+                }`}
+                style={{ borderColor: isSelected ? "#ffffff" : color }}
+              >
+                {/* Cyber Corner HUD Brackets */}
+                <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-white" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-white" />
+                <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-white" />
+                <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-white" />
+
+                {/* Top Badge: Change Type & Confidence */}
+                <div className="flex items-center justify-between gap-1">
+                  <span className="px-1.5 py-0.5 rounded bg-black/85 border border-rose-500/50 text-[9px] font-mono font-bold text-white flex items-center gap-1 shadow-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+                    <span>▲ CHANGE: {zone.category}</span>
+                  </span>
+                  <span className="px-1 py-0.5 rounded bg-black/85 text-[8px] font-mono font-bold text-emerald-300">
+                    {zone.confidence}% AI
+                  </span>
+                </div>
+
+                {/* Bottom Badge: Area and Details */}
+                <div className="flex flex-col gap-0.5 mt-auto">
+                  <span className="px-1.5 py-0.5 rounded bg-black/90 text-[8px] font-mono font-semibold text-rose-200 line-clamp-1">
+                    +{zone.areaHa} ha · {zone.label}
+                  </span>
+                  {isSelected && (
+                    <span className="p-1 rounded bg-slate-950/95 border border-rose-500/60 text-[8px] text-slate-200 leading-tight animate-fadeIn">
+                      {zone.deltaSummary}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="flex-1 flex flex-col xl:flex-row h-full overflow-y-auto xl:overflow-hidden bg-[#060913] text-slate-100 select-text pb-16 md:pb-0">
@@ -910,27 +1191,45 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           </div>
         </div>
 
-        {/* View Mode Switcher (Swipe, Dual, Inspector) */}
+        {/* View Mode Switcher (Swipe, Dual, Inspector) + Change Highlights Toggle */}
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] text-slate-400 font-medium">View Layout:</span>
-          <div className="flex gap-1.5">
-            {(["swipe", "dual", "inspector"] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setViewMode(v)}
-                className={`px-3 py-1 rounded text-[10px] font-mono uppercase transition border flex items-center gap-1.5 ${
-                  viewMode === v
-                    ? "bg-indigo-600 text-white font-bold border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
-                    : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                {viewMode === v && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
-                )}
-                <span>{v}</span>
-              </button>
-            ))}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-slate-400 font-medium">View Layout:</span>
+            <div className="flex gap-1">
+              {(["swipe", "dual", "inspector"] as const).map((v) => (
+                <button
+                  key={v}
+                  id={`sidebar-btn-layout-${v}`}
+                  onClick={() => setViewMode(v)}
+                  className={`px-2.5 py-1 rounded text-[10px] font-mono uppercase transition border flex items-center gap-1.5 ${
+                    viewMode === v
+                      ? "bg-indigo-600 text-white font-bold border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                      : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {viewMode === v && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
+                  )}
+                  <span>{v}</span>
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Toggle Change Highlights / Delta Mask */}
+          <button
+            id="btn-toggle-change-highlights"
+            onClick={() => setShowChangeHighlights(!showChangeHighlights)}
+            className={`px-2 py-1 rounded text-[10px] font-mono transition border flex items-center gap-1.5 ${
+              showChangeHighlights
+                ? "bg-rose-500/25 border-rose-400 text-rose-200 font-bold shadow-[0_0_8px_rgba(244,63,94,0.4)]"
+                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+            }`}
+            title="Toggle glowing AI change detection bounding boxes and labels"
+          >
+            <Eye className={`w-3.5 h-3.5 ${showChangeHighlights ? "text-rose-400 animate-pulse" : "text-slate-500"}`} />
+            <span>Delta Mask: {showChangeHighlights ? "ON" : "OFF"}</span>
+          </button>
         </div>
 
         {/* INTERACTIVE COMPARISON VIEWER */}
@@ -947,28 +1246,40 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
         >
           {viewMode === "dual" ? (
             /* DUAL SIDE-BY-SIDE VIEW */
-            <div className="absolute inset-0 grid grid-cols-2 gap-0.5 bg-indigo-950/80">
+            <div className="absolute inset-0 grid grid-cols-2 gap-1 bg-indigo-950/80">
+              {/* BEFORE PANEL */}
               <div
-                className="relative h-full bg-cover bg-center transition-all duration-300"
+                className="relative h-full bg-cover bg-center transition-all duration-300 overflow-hidden"
                 style={{
                   backgroundImage: `url('${currentPreset.beforeImg}')`,
                   filter: getSpectralFilter(),
                 }}
               >
-                <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-slate-950/85 border border-slate-700 text-[9px] font-mono text-slate-200">
+                <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-slate-950/90 border border-slate-700 text-[9px] font-mono text-slate-200 z-20 shadow-md">
                   BEFORE: {baselineDate}
                 </div>
+                <div className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded bg-slate-950/85 border border-slate-800 text-[8px] font-mono text-slate-400 z-20">
+                  Pre-Development Baseline
+                </div>
+                {renderChangePolygons(true)}
               </div>
+
+              {/* AFTER PANEL */}
               <div
-                className="relative h-full bg-cover bg-center border-l-2 border-indigo-500/70 transition-all duration-300"
+                className="relative h-full bg-cover bg-center border-l-2 border-indigo-500/70 transition-all duration-300 overflow-hidden"
                 style={{
                   backgroundImage: `url('${currentPreset.afterImg}')`,
                   filter: getSpectralFilter(),
                 }}
               >
-                <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-indigo-950/90 border border-indigo-500/50 text-[9px] font-mono text-indigo-200">
+                <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-rose-950/90 border border-rose-500/60 text-[9px] font-mono text-rose-200 font-bold z-20 shadow-[0_0_8px_rgba(244,63,94,0.4)]">
                   AFTER: {inspectionDate}
                 </div>
+                <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-rose-950/90 border border-rose-600/40 text-[8px] font-mono text-rose-300 z-20 flex items-center gap-1 shadow-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+                  <span>{(currentPreset.changeFeatures || []).length} Detected Changes</span>
+                </div>
+                {renderChangePolygons(false)}
               </div>
             </div>
           ) : viewMode === "inspector" ? (
@@ -981,32 +1292,15 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
               }}
             >
               {/* Thermal change difference overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/40 via-amber-500/30 to-emerald-500/20 mix-blend-color-dodge pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/45 via-amber-500/35 to-emerald-500/25 mix-blend-color-dodge pointer-events-none" />
 
-              {/* Anomaly Detection Polygons / Tags */}
-              <div className="absolute top-1/4 left-1/3 w-32 h-20 border-2 border-dashed border-rose-400 rounded bg-rose-500/25 backdrop-blur-[1px] flex flex-col justify-between p-1.5 shadow-[0_0_15px_rgba(244,63,94,0.5)] animate-pulse">
-                <span className="text-[9px] font-mono font-bold text-rose-100 bg-rose-950/90 px-1 py-0.5 rounded flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-                  Cluster #1: 96.4%
-                </span>
-                <span className="text-[8px] font-mono text-rose-200 bg-black/60 px-1 rounded">
-                  NDVI: {currentPreset.ndviDrop} (Vegetation Loss)
-                </span>
-              </div>
+              {/* Render dynamic change polygons */}
+              {renderChangePolygons(false)}
 
-              <div className="absolute bottom-1/4 right-1/4 w-28 h-18 border-2 border-dashed border-amber-400 rounded bg-amber-500/25 backdrop-blur-[1px] flex flex-col justify-between p-1.5 shadow-[0_0_15px_rgba(245,158,11,0.5)]">
-                <span className="text-[9px] font-mono font-bold text-amber-100 bg-amber-950/90 px-1 py-0.5 rounded">
-                  Cluster #2: 91.2%
-                </span>
-                <span className="text-[8px] font-mono text-amber-200 bg-black/60 px-1 rounded">
-                  Albedo: {currentPreset.albedoShift} (Hard Surface)
-                </span>
-              </div>
-
-              <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/60 text-[10px] font-mono text-rose-300 font-bold shadow-[0_0_8px_rgba(244,63,94,0.3)]">
+              <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/60 text-[10px] font-mono text-rose-300 font-bold shadow-[0_0_8px_rgba(244,63,94,0.3)] z-20">
                 INSPECTOR: CHANGE HEATMAP ACTIVE
               </div>
-              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/90 border border-slate-700 text-[10px] font-mono text-slate-300">
+              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/90 border border-slate-700 text-[10px] font-mono text-slate-300 z-20">
                 PROBE: {coords[1].toFixed(3)}°N, {coords[0].toFixed(3)}°E
               </div>
             </div>
@@ -1021,12 +1315,13 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
                   filter: getSpectralFilter(),
                 }}
               >
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 border border-slate-700 text-[10px] font-mono text-slate-300">
-                  BEFORE: {baselineDate}
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/85 border border-slate-700 text-[10px] font-mono text-slate-300 z-20 shadow-md">
+                  BEFORE: {baselineDate} (Natural Ground)
                 </div>
+                {renderChangePolygons(true)}
               </div>
 
-              {/* INSPECTION IMAGE */}
+              {/* INSPECTION IMAGE WITH DETECTED CHANGE HIGHLIGHTS */}
               <div
                 className="absolute inset-0 bg-cover bg-center transition-all duration-300"
                 style={{
@@ -1035,9 +1330,10 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
                   clipPath: `polygon(${swipePosition}% 0, 100% 0, 100% 100%, ${swipePosition}% 100%)`,
                 }}
               >
-                <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-500/40 text-[10px] font-mono text-indigo-300">
-                  AFTER: {inspectionDate}
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/60 text-[10px] font-mono text-rose-200 font-bold z-20 shadow-[0_0_10px_rgba(244,63,94,0.5)]">
+                  AFTER: {inspectionDate} (Ground Modifications)
                 </div>
+                {renderChangePolygons(false)}
               </div>
 
               {/* SWIPE DRAG HANDLE */}
@@ -1069,6 +1365,54 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
               </div>
             </>
           )}
+        </div>
+
+        {/* DETECTED SURFACE MODIFICATIONS CARDS */}
+        <div className="flex flex-col gap-2 p-3 rounded-xl bg-slate-900/80 border border-indigo-500/30 shadow-inner">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse shadow-[0_0_8px_#f43f5e]" />
+              <span className="text-[11px] font-mono font-bold text-slate-200 uppercase tracking-wide">
+                Detected Ground Modifications ({(currentPreset.changeFeatures || []).length} Zones)
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-indigo-400">
+              ChangeFormer V6
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {(currentPreset.changeFeatures || []).map((zone) => {
+              const isSelected = selectedZoneId === zone.id;
+              return (
+                <div
+                  key={zone.id}
+                  onClick={() => setSelectedZoneId(isSelected ? null : zone.id)}
+                  className={`p-2 rounded-lg border transition cursor-pointer flex flex-col gap-1 ${
+                    isSelected
+                      ? "bg-rose-950/40 border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
+                      : "bg-slate-950/70 border-slate-800 hover:border-slate-700"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-white line-clamp-1">
+                      {zone.label}
+                    </span>
+                    <span className="px-1 py-0.5 rounded text-[8px] font-mono bg-rose-500/20 text-rose-300 font-semibold">
+                      +{zone.areaHa} ha
+                    </span>
+                  </div>
+                  <p className="text-[9px] text-slate-400 line-clamp-2">
+                    {zone.deltaSummary}
+                  </p>
+                  <div className="flex items-center justify-between pt-0.5 text-[8px] font-mono text-slate-500">
+                    <span>{zone.category}</span>
+                    <span className="text-emerald-400 font-bold">{zone.confidence}% Match</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* AI ANALYSIS AGENT REPORT */}
