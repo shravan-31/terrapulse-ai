@@ -420,9 +420,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
   );
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-[#060913] text-slate-100">
+    <div className="flex-1 flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden bg-[#060913] text-slate-100 pb-16 md:pb-0">
       {/* Left Mission Control Sidebar */}
-      <div className="w-full md:w-[460px] border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 z-10">
+      <div className="w-full md:w-[460px] border-b md:border-b-0 md:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 z-10 max-h-[55vh] md:max-h-full">
         {/* Top Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -682,7 +682,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onInvestigateTarget 
       </div>
 
       {/* Right Map Canvas */}
-      <div className="flex-1 relative flex flex-col h-full">
+      <div className="flex-1 relative flex flex-col min-h-[360px] h-[50vh] md:h-full shrink-0">
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
         {/* Map Top Floating Controls */}

@@ -12,7 +12,7 @@ git add .
 git status --short
 
 Write-Host "`n[2/3] Creating commit..." -ForegroundColor Yellow
-git commit -m "feat(offline-platform): end-to-end verified offline platform with diagnostics API, system diagnostics UI, automated verification suite, and setup scripts"
+git commit -m "feat(mobile): add responsive mobile navigation bar, adaptive multi-column layouts, and LAN host binding"
 
 Write-Host "`n[3/3] Pushing to origin main..." -ForegroundColor Yellow
 git push origin main

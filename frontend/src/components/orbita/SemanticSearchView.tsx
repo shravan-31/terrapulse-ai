@@ -301,9 +301,9 @@ export const SemanticSearchView: React.FC<SemanticSearchViewProps> = ({ onInvest
   };
 
   return (
-    <div className="flex-1 flex flex-col xl:flex-row h-full overflow-hidden bg-[#060913] text-slate-100 select-text">
+    <div className="flex-1 flex flex-col xl:flex-row h-full overflow-y-auto xl:overflow-hidden bg-[#060913] text-slate-100 select-text pb-16 md:pb-0">
       {/* Left Search & Results Panel */}
-      <div className="w-full xl:w-[500px] border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-auto p-5 gap-5 z-10">
+      <div className="w-full xl:w-[500px] border-b xl:border-b-0 xl:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto p-4 sm:p-5 gap-5 z-10">
         {/* Title */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
@@ -446,7 +446,7 @@ export const SemanticSearchView: React.FC<SemanticSearchViewProps> = ({ onInvest
       </div>
 
       {/* Right Map Canvas */}
-      <div className="flex-1 relative flex flex-col min-h-[350px] xl:min-h-0">
+      <div className="flex-1 relative flex flex-col min-h-[360px] h-[50vh] xl:h-auto xl:min-h-0 shrink-0">
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
         {/* Map Top Floating Badge */}

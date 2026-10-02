@@ -308,14 +308,21 @@ export async function reviewChange(
   if (creds) {
     headers["Authorization"] = _authHeader(creds.username, creds.password);
   }
-  const resp = await fetch(`/api/change/changes/${changeId}/review`, {
+  const payload = {
+    decision,
+    review_status: decision,
+    notes,
+    comment: notes,
+  };
+  const encodedId = encodeURIComponent(changeId);
+  const resp = await fetch(`/api/change/changes/${encodedId}/review`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ decision, notes }),
+    body: JSON.stringify(payload),
   });
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
-    throw new Error(err.error || `Review submission failed: HTTP ${resp.status}`);
+    throw new Error(err.detail || err.error || `Review submission failed: HTTP ${resp.status}`);
   }
   return resp.json();
 }

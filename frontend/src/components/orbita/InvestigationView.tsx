@@ -489,9 +489,9 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
   };
 
   return (
-    <div className="flex-1 flex flex-col xl:flex-row h-full overflow-hidden bg-[#060913] text-slate-100 select-text">
+    <div className="flex-1 flex flex-col xl:flex-row h-full overflow-y-auto xl:overflow-hidden bg-[#060913] text-slate-100 select-text pb-16 md:pb-0">
       {/* ================= LEFT COLUMN: TARGET & TIME CONFIG ================= */}
-      <div className="w-full xl:w-[380px] border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-auto p-4 gap-4 z-10">
+      <div className="w-full xl:w-[380px] border-b xl:border-b-0 xl:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto p-4 gap-4 z-10">
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-indigo-400" />
@@ -677,7 +677,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
 
       {/* ================= CENTER COLUMN: MAP VIEWPORT ================= */}
-      <div className="flex-1 relative flex flex-col min-h-[360px] xl:min-h-0 border-r border-slate-800">
+      <div className="flex-1 relative flex flex-col min-h-[360px] h-[45vh] xl:h-auto xl:min-h-0 border-b xl:border-b-0 xl:border-r border-slate-800 shrink-0">
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
         {/* Map Floating Controls */}
@@ -718,7 +718,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
       </div>
 
       {/* ================= RIGHT COLUMN: IMAGERY COMPARISON & AI REPORT ================= */}
-      <div className="w-full xl:w-[480px] bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-auto p-4 gap-4 z-10">
+      <div className="w-full xl:w-[480px] bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto p-4 gap-4 z-10">
         {/* Pass Header & Export */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div>

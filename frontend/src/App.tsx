@@ -63,37 +63,37 @@ export function App() {
   return (
     <div className="flex flex-col h-screen w-screen bg-[#060913] text-slate-100 overflow-hidden select-none font-sans">
       {/* Top Header */}
-      <header className="h-14 border-b border-indigo-950/60 bg-[#0b0f20]/95 backdrop-blur-md px-5 flex items-center justify-between z-30 shrink-0">
+      <header className="h-14 border-b border-indigo-950/60 bg-[#0b0f20]/95 backdrop-blur-md px-3 md:px-5 flex items-center justify-between z-30 shrink-0">
         {/* Left Branding */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div
             onClick={() => setActiveView("mission")}
-            className="flex items-center gap-2.5 cursor-pointer group"
+            className="flex items-center gap-2 cursor-pointer group"
           >
             {/* Custom Modern Logo: Glowing Aperture Radar in Electric Indigo & Emerald */}
-            <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.35)] group-hover:scale-105 transition">
+            <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.35)] group-hover:scale-105 transition shrink-0">
               <Radio className="w-4 h-4 text-indigo-300" />
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-base font-black tracking-wider text-white font-mono group-hover:text-indigo-300 transition">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono group-hover:text-indigo-300 transition">
                   TerraPulse<span className="text-indigo-400">.AI</span>
                 </span>
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 uppercase font-semibold">
-                  ENTERPRISE
+                <span className="text-[8px] sm:text-[9px] font-mono px-1 sm:px-1.5 py-0.5 rounded bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 uppercase font-semibold">
+                  OFFLINE
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 tracking-wider">
+              <p className="hidden sm:block text-[10px] text-slate-400 tracking-wider">
                 Autonomous Earth Observation & Change Intelligence
               </p>
             </div>
           </div>
         </div>
 
-        {/* Center Primary Navigation */}
-        <nav className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-indigo-950/70 shadow-inner">
+        {/* Center Primary Navigation (Desktop) */}
+        <nav className="hidden md:flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-indigo-950/70 shadow-inner">
           <button
             id="nav-mission"
             onClick={() => setActiveView("mission")}
@@ -148,16 +148,16 @@ export function App() {
         </nav>
 
         {/* Right Actions & Telemetry */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Ingest GeoTIFF Action */}
           <button
             id="btn-ingest-raster"
             onClick={() => setShowIngestModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition shadow-[0_0_10px_rgba(16,185,129,0.2)]"
             title="Upload and ingest real satellite GeoTIFF or COG files"
           >
-            <UploadCloud className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Ingest GeoTIFF</span>
+            <UploadCloud className="w-4 h-4 text-emerald-400" />
+            <span className="hidden sm:inline">Ingest GeoTIFF</span>
           </button>
 
           {/* New Scan Action */}
@@ -279,7 +279,7 @@ export function App() {
       )}
 
       {/* Main Workspace Display */}
-      <main className="flex-1 flex overflow-hidden relative">
+      <main className="flex-1 flex overflow-hidden relative pb-16 md:pb-0">
         {activeView === "mission" && <MissionView onNavigate={(view) => setActiveView(view)} />}
         {activeView === "console" && (
           <OverviewView onInvestigateTarget={handleInvestigateTarget} />
@@ -289,6 +289,66 @@ export function App() {
           <SemanticSearchView onInvestigateTarget={handleInvestigateTarget} />
         )}
       </main>
+
+      {/* Mobile Bottom Navigation Bar for Touch Devices */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b19]/95 backdrop-blur-xl border-t border-indigo-950/80 px-2 py-2 flex items-center justify-around shadow-[0_-5px_20px_rgba(0,0,0,0.6)]">
+        <button
+          id="mobile-nav-mission"
+          onClick={() => setActiveView("mission")}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-[10px] font-medium transition ${
+            activeView === "mission"
+              ? "text-indigo-400 font-bold"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Compass className="w-4 h-4" />
+          <span>Mission</span>
+        </button>
+        <button
+          id="mobile-nav-console"
+          onClick={() => setActiveView("console")}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-[10px] font-medium transition ${
+            activeView === "console"
+              ? "text-indigo-400 font-bold"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          <span>Overview</span>
+        </button>
+        <button
+          id="mobile-nav-investigate"
+          onClick={() => setActiveView("investigate")}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-[10px] font-medium transition ${
+            activeView === "investigate"
+              ? "text-indigo-400 font-bold"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Search className="w-4 h-4" />
+          <span>Investigate</span>
+        </button>
+        <button
+          id="mobile-nav-search"
+          onClick={() => setActiveView("search")}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-[10px] font-medium transition ${
+            activeView === "search"
+              ? "text-purple-400 font-bold"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>Semantic</span>
+        </button>
+        <button
+          id="mobile-nav-ingest"
+          onClick={() => setShowIngestModal(true)}
+          className="flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-[10px] font-medium text-emerald-400 hover:text-emerald-300 transition"
+        >
+          <UploadCloud className="w-4 h-4" />
+          <span>Ingest</span>
+        </button>
+      </nav>
 
       {/* Offline GeoTIFF Ingestion Modal */}
       <IngestModal
