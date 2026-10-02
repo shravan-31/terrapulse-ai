@@ -12,7 +12,7 @@ git add .
 git status --short
 
 Write-Host "`n[2/3] Creating commit..." -ForegroundColor Yellow
-git commit -m "feat(change-detection): add high-visibility change bounding polygons, delta mask toggle, and zone breakdown cards for Before vs After comparison"
+git commit -m "fix(investigation): resolve laptop view layout visibility with workspace switcher and display authentic satellite map in comparison viewer"
 
 Write-Host "`n[3/3] Pushing to origin main..." -ForegroundColor Yellow
 git push origin main

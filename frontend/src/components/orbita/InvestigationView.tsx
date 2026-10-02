@@ -20,6 +20,9 @@ import {
   RefreshCw,
   Cpu,
   CheckCheck,
+  PanelLeftClose,
+  PanelLeftOpen,
+  MapPin,
 } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -69,8 +72,8 @@ const PRESET_TARGETS: {
     ndviDrop: "-0.44",
     albedoShift: "+0.31",
     activity: "Industrial Solar Expansion",
-    beforeImg: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
-    afterImg: "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1000&q=80",
+    beforeImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=71.8500,27.4800,71.8820,27.5120&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
+    afterImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=71.9000,27.5200,71.9320,27.5520&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
     changeFeatures: [
       {
         id: "bhadla-zone-1",
@@ -108,8 +111,8 @@ const PRESET_TARGETS: {
     ndviDrop: "-0.18",
     albedoShift: "+0.22",
     activity: "Maritime Port Infrastructure",
-    beforeImg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
-    afterImg: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1000&q=80",
+    beforeImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=69.6500,22.7000,69.6820,22.7320&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
+    afterImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=69.7000,22.7400,69.7320,22.7720&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
     changeFeatures: [
       {
         id: "mundra-zone-1",
@@ -147,8 +150,8 @@ const PRESET_TARGETS: {
     ndviDrop: "-0.52",
     albedoShift: "+0.38",
     activity: "Open-Pit Mining & Earthworks",
-    beforeImg: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80",
-    afterImg: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1000&q=80",
+    beforeImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=82.6200,22.3100,82.6520,22.3400&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
+    afterImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=82.6700,22.3450,82.7020,22.3750&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
     changeFeatures: [
       {
         id: "korba-zone-1",
@@ -186,8 +189,8 @@ const PRESET_TARGETS: {
     ndviDrop: "-0.32",
     albedoShift: "+0.15",
     activity: "Urban Infrastructure Construction",
-    beforeImg: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1000&q=80",
-    afterImg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
+    beforeImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=77.1600,28.5700,77.1900,28.6000&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
+    afterImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=77.2000,28.6050,77.2300,28.6350&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
     changeFeatures: [
       {
         id: "delhi-zone-1",
@@ -225,8 +228,8 @@ const PRESET_TARGETS: {
     ndviDrop: "-0.08",
     albedoShift: "+0.26",
     activity: "Roadway Engineering & Embankment",
-    beforeImg: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
-    afterImg: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
+    beforeImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=78.6300,33.7100,78.6620,33.7400&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
+    afterImg: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=78.6800,33.7450,78.7120,33.7750&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image",
     changeFeatures: [
       {
         id: "pangong-zone-1",
@@ -280,6 +283,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
   const [heatmapEnabled, setHeatmapEnabled] = useState(true);
   const [map3D, setMap3D] = useState(false);
+  const [workspaceTab, setWorkspaceTab] = useState<"split" | "comparison" | "map">("split");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // AI Agent Q&A
   const [chatInput, setChatInput] = useState("");
@@ -335,8 +340,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
     ndviDrop: "-0.24",
     albedoShift: "+0.18",
     activity: "User Geolocation Surveillance Pass",
-    beforeImg: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
-    afterImg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+    beforeImg: `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${(coords[0] - 0.03).toFixed(4)},${(coords[1] - 0.03).toFixed(4)},${(coords[0] - 0.005).toFixed(4)},${(coords[1] - 0.005).toFixed(4)}&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image`,
+    afterImg: `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${(coords[0] - 0.015).toFixed(4)},${(coords[1] - 0.015).toFixed(4)},${(coords[0] + 0.015).toFixed(4)},${(coords[1] + 0.015).toFixed(4)}&bboxSR=4326&imageSR=4326&size=1024,1024&format=jpg&f=image`,
     changeFeatures: [
       {
         id: "custom-zone-1",
@@ -823,9 +828,131 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
   };
 
   return (
-    <div className="flex-1 flex flex-col xl:flex-row h-full overflow-y-auto xl:overflow-hidden bg-[#060913] text-slate-100 select-text pb-16 md:pb-0">
-      {/* ================= LEFT COLUMN: TARGET & TIME CONFIG ================= */}
-      <div className="w-full xl:w-[380px] border-b xl:border-b-0 xl:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto xl:h-full xl:max-h-full p-4 gap-4 z-10">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#060913] text-slate-100 select-text pb-16 md:pb-0">
+      {/* ================= TOP WORKSPACE CONTROLS BAR (LAPTOP & MOBILE QUICK SWITCHER) ================= */}
+      <div className="px-3 sm:px-4 py-2 bg-[#090d1f] border-b border-indigo-950/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 shadow-md">
+        {/* Left: Sidebar Toggle + Workspace View Tabs */}
+        <div className="flex items-center gap-2">
+          <button
+            id="btn-toggle-sidebar"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className={`p-1.5 rounded-lg border text-xs font-mono transition flex items-center gap-1.5 ${
+              isSidebarOpen
+                ? "bg-indigo-600/30 border-indigo-500/50 text-indigo-300"
+                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+            }`}
+            title={isSidebarOpen ? "Collapse Targets Panel" : "Expand Targets Panel"}
+          >
+            {isSidebarOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline text-[11px] font-medium">{isSidebarOpen ? "Hide Target Panel" : "Show Targets"}</span>
+          </button>
+
+          {/* Mode Switcher: Split | View Layout | Map Focus */}
+          <div className="flex items-center p-0.5 rounded-lg bg-slate-900/90 border border-slate-800 shadow-inner">
+            <button
+              id="btn-workspace-split"
+              onClick={() => setWorkspaceTab("split")}
+              className={`px-2.5 py-1 rounded text-[11px] font-mono transition flex items-center gap-1.5 ${
+                workspaceTab === "split"
+                  ? "bg-indigo-600 text-white font-bold shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              title="Split Workspace (Map & Pass Comparison side-by-side)"
+            >
+              <GitCompare className="w-3 h-3" />
+              <span>Split Console</span>
+            </button>
+            <button
+              id="btn-workspace-comparison"
+              onClick={() => setWorkspaceTab("comparison")}
+              className={`px-2.5 py-1 rounded text-[11px] font-mono transition flex items-center gap-1.5 ${
+                workspaceTab === "comparison"
+                  ? "bg-indigo-600 text-white font-bold shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              title="Focus on View Layout (Full Width Comparison & Detection)"
+            >
+              <Sliders className="w-3 h-3" />
+              <span>View Layout</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_4px_#34d399]" />
+            </button>
+            <button
+              id="btn-workspace-map"
+              onClick={() => setWorkspaceTab("map")}
+              className={`px-2.5 py-1 rounded text-[11px] font-mono transition flex items-center gap-1.5 ${
+                workspaceTab === "map"
+                  ? "bg-indigo-600 text-white font-bold shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              title="Full Map Viewport"
+            >
+              <Layers className="w-3 h-3" />
+              <span>Map View</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Center/Right: Target Name Badge + Direct View Layout Mode Buttons */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px] font-mono text-indigo-300">
+            <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="font-bold text-white tracking-wide">{selectedTarget}</span>
+          </div>
+
+          {/* Quick View Layout Buttons in Header for Instant Access */}
+          <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 rounded-lg border border-slate-800">
+            <span className="text-[10px] text-slate-500 font-mono px-1 hidden md:inline">Layout:</span>
+            {(["swipe", "dual", "inspector"] as const).map((v) => (
+              <button
+                key={v}
+                id={`topbar-btn-layout-${v}`}
+                onClick={() => setViewMode(v)}
+                className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase transition ${
+                  viewMode === v
+                    ? "bg-indigo-600 text-white font-bold shadow-[0_0_6px_rgba(99,102,241,0.5)]"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick Spectral Band in Header */}
+          <div className="hidden lg:flex items-center gap-1 bg-slate-900/90 p-0.5 rounded-lg border border-slate-800">
+            <button
+              onClick={() => setSpectralBand("true_color")}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
+                spectralBand === "true_color" ? "bg-indigo-600 text-white font-bold" : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              RGB
+            </button>
+            <button
+              onClick={() => setSpectralBand("nir")}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
+                spectralBand === "nir" ? "bg-rose-600 text-white font-bold" : "text-slate-400 hover:text-rose-300"
+              }`}
+            >
+              NIR
+            </button>
+            <button
+              onClick={() => setSpectralBand("night")}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
+                spectralBand === "night" ? "bg-purple-600 text-white font-bold" : "text-slate-400 hover:text-purple-300"
+              }`}
+            >
+              Night
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Responsive Grid Workspace */}
+      <div className="flex-1 flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden">
+        {/* ================= LEFT COLUMN: TARGET & TIME CONFIG ================= */}
+        {isSidebarOpen && (
+          <div className="w-full lg:w-[320px] xl:w-[360px] border-b lg:border-b-0 lg:border-r border-indigo-950/60 bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-auto h-auto lg:h-full p-4 gap-4 z-10">
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-indigo-400" />
@@ -1008,10 +1135,15 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           </div>
         </div>
       </div>
-
+      )}
 
       {/* ================= CENTER COLUMN: MAP VIEWPORT ================= */}
-      <div className="flex-1 relative flex flex-col min-h-[360px] h-[45vh] xl:h-full border-b xl:border-b-0 xl:border-r border-slate-800 shrink-0">
+      {(workspaceTab === "split" || workspaceTab === "map") && (
+        <div className={`relative flex flex-col border-b lg:border-b-0 lg:border-r border-slate-800 shrink-0 ${
+          workspaceTab === "map"
+            ? "flex-1 h-full w-full"
+            : "flex-1 min-h-[350px] h-[45vh] lg:h-full"
+        }`}>
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
 
         {/* Map Floating Controls with Synchronized Spectral Band and View Layout */}
@@ -1116,10 +1248,46 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           <span className="text-slate-600">|</span>
           <span className="text-emerald-400 uppercase font-bold">{viewMode}</span>
         </div>
-      </div>
 
-      {/* ================= RIGHT COLUMN: IMAGERY COMPARISON & AI REPORT ================= */}
-      <div className="w-full xl:w-[480px] bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-visible xl:overflow-y-auto xl:h-full xl:max-h-full p-4 gap-4 z-10">
+        {/* Dynamic On-Map Visual Indicators for Swipe and Dual Layout Modes */}
+        {viewMode === "swipe" && (
+          <div className="absolute inset-0 pointer-events-none z-10 flex">
+            <div className="w-1/2 h-full border-r-2 border-indigo-400/80 relative bg-indigo-950/5">
+              <div className="absolute top-16 left-4 px-2 py-1 rounded bg-slate-950/90 border border-indigo-500/40 text-[10px] font-mono text-indigo-200 shadow-lg">
+                BASELINE: 2024 Sentinel-2
+              </div>
+            </div>
+            <div className="w-1/2 h-full relative bg-rose-950/5">
+              <div className="absolute top-16 right-4 px-2 py-1 rounded bg-rose-950/90 border border-rose-500/50 text-[10px] font-mono text-rose-200 shadow-lg">
+                DELTA PASS: 2026 Ground Modifications
+              </div>
+            </div>
+          </div>
+        )}
+        {viewMode === "dual" && (
+          <div className="absolute inset-0 pointer-events-none z-10 flex border-2 border-dashed border-indigo-500/30">
+            <div className="w-1/2 h-full border-r-2 border-dashed border-indigo-400/60 p-3 flex flex-col justify-end">
+              <span className="px-2 py-1 self-start rounded bg-slate-950/90 text-[10px] font-mono text-slate-300 border border-slate-700 shadow-lg">
+                DUAL: Pre-Modification Natural State
+              </span>
+            </div>
+            <div className="w-1/2 h-full p-3 flex flex-col justify-end items-end">
+              <span className="px-2 py-1 rounded bg-rose-950/90 text-[10px] font-mono text-rose-300 border border-rose-500/60 shadow-lg">
+                DUAL: Post-Development Surface Delta
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+      )}
+
+      {/* ================= RIGHT COLUMN: IMAGERY COMPARISON & AI REPORT (VIEW LAYOUT) ================= */}
+      {(workspaceTab === "split" || workspaceTab === "comparison") && (
+        <div className={`bg-[#0a0f22]/95 backdrop-blur-md flex flex-col shrink-0 overflow-y-auto h-auto lg:h-full p-4 gap-4 z-10 ${
+          workspaceTab === "comparison"
+            ? "flex-1 w-full max-w-5xl mx-auto p-4 lg:p-6"
+            : "w-full lg:w-[480px] xl:w-[520px]"
+        }`}>
         {/* Pass Header & Export */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div>
@@ -1242,14 +1410,14 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           onTouchMove={(e) => {
             if (viewMode === "swipe") handleContainerPointer(e);
           }}
-          className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-indigo-500/40 bg-slate-950 shadow-[0_0_20px_rgba(99,102,241,0.2)] select-none cursor-crosshair"
+          className="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/9] min-h-[320px] rounded-xl overflow-hidden border border-indigo-500/40 bg-slate-950 shadow-[0_0_20px_rgba(99,102,241,0.2)] select-none cursor-crosshair"
         >
           {viewMode === "dual" ? (
             /* DUAL SIDE-BY-SIDE VIEW */
             <div className="absolute inset-0 grid grid-cols-2 gap-1 bg-indigo-950/80">
               {/* BEFORE PANEL */}
               <div
-                className="relative h-full bg-cover bg-center transition-all duration-300 overflow-hidden"
+                className="relative h-full bg-cover bg-center transition-all duration-300 overflow-hidden bg-slate-900"
                 style={{
                   backgroundImage: `url('${currentPreset.beforeImg}')`,
                   filter: getSpectralFilter(),
@@ -1266,7 +1434,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
               {/* AFTER PANEL */}
               <div
-                className="relative h-full bg-cover bg-center border-l-2 border-indigo-500/70 transition-all duration-300 overflow-hidden"
+                className="relative h-full bg-cover bg-center border-l-2 border-indigo-500/70 transition-all duration-300 overflow-hidden bg-slate-900"
                 style={{
                   backgroundImage: `url('${currentPreset.afterImg}')`,
                   filter: getSpectralFilter(),
@@ -1285,7 +1453,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
           ) : viewMode === "inspector" ? (
             /* INSPECTOR HEATMAP MODE */
             <div
-              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300 bg-slate-900"
               style={{
                 backgroundImage: `url('${currentPreset.afterImg}')`,
                 filter: getSpectralFilter(),
@@ -1309,7 +1477,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
             <>
               {/* BASELINE IMAGE */}
               <div
-                className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+                className="absolute inset-0 bg-cover bg-center transition-all duration-300 bg-slate-900"
                 style={{
                   backgroundImage: `url('${currentPreset.beforeImg}')`,
                   filter: getSpectralFilter(),
@@ -1323,7 +1491,7 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
 
               {/* INSPECTION IMAGE WITH DETECTED CHANGE HIGHLIGHTS */}
               <div
-                className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+                className="absolute inset-0 bg-cover bg-center transition-all duration-300 bg-slate-900"
                 style={{
                   backgroundImage: `url('${currentPreset.afterImg}')`,
                   filter: getSpectralFilter(),
@@ -1706,6 +1874,8 @@ export const InvestigationView: React.FC<InvestigationViewProps> = ({ initialTar
             </button>
           </div>
         </div>
+      </div>
+      )}
       </div>
     </div>
   );
